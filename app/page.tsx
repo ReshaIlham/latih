@@ -46,7 +46,7 @@ export default function Home() {
             <div className="flex items-center justify-center mt-8 lg:mt-0">
               <div className="animate-slide-up [animation-delay:600ms] relative w-full max-w-[500px] rounded-lg overflow-hidden shadow-xl">
                 <Image
-                  src="/images/psm-certification.jpg"
+                  src="/placeholder.svg?height=300&width=500&text=Certification+Practice"
                   alt="Certification Practice"
                   width={500}
                   height={300}
@@ -73,7 +73,7 @@ export default function Home() {
             <div className="certification-card group bg-white rounded-xl border shadow-card overflow-hidden hover:shadow-medium transition-all duration-200 flex flex-col h-full">
               <Link href="/certifications/psm" className="block relative">
                 <Image
-                  src="/images/psm-certification.jpg"
+                  src="/placeholder.svg?height=200&width=360&text=Professional+Scrum+Master"
                   alt="Professional Scrum Master"
                   width={360}
                   height={200}
@@ -117,7 +117,7 @@ export default function Home() {
             <div className="certification-card group bg-white rounded-xl border shadow-card overflow-hidden hover:shadow-medium transition-all duration-200 flex flex-col h-full">
               <Link href="/certifications/pspo" className="block relative">
                 <Image
-                  src="/images/pspo-certification.jpg"
+                  src="/placeholder.svg?height=200&width=360&text=Professional+Scrum+Product+Owner"
                   alt="Professional Scrum Product Owner"
                   width={360}
                   height={200}
@@ -169,7 +169,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Rest of the page remains unchanged */}
       {/* Features Section */}
       <section className="w-full py-12 md:py-24 bg-primary/5">
         <div className="container">
@@ -396,52 +395,47 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-medium mb-4">Certifications</h3>
+            <h3 className="text-sm font-medium mb-4">Main Menu</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Professional Scrum Master
-                </a>
+                <Link href="/my-certifications" className="text-muted-foreground hover:text-foreground">
+                  My Certifications
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Professional Scrum Product Owner
-                </a>
+                <Link href="/certifications" className="text-muted-foreground hover:text-foreground">
+                  Browse Certifications
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  View All
-                </a>
+                <Link href="/pricing" className="text-muted-foreground hover:text-foreground">
+                  Pricing
+                </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-medium mb-4">Company</h3>
+            <h3 className="text-sm font-medium mb-4">Account</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  About Us
-                </a>
+                <Link href="/login" className="text-muted-foreground hover:text-foreground">
+                  Login
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Careers
-                </a>
+                <Link href="/signup" className="text-muted-foreground hover:text-foreground">
+                  Sign Up
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Blog
-                </a>
+                <Link href="/forgot-password" className="text-muted-foreground hover:text-foreground">
+                  Forgot Password
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Press
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Contact
-                </a>
+                <Link href="/profile" className="text-muted-foreground hover:text-foreground">
+                  Profile
+                </Link>
               </li>
             </ul>
           </div>

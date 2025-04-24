@@ -34,7 +34,8 @@ export default function Header() {
   }, [])
 
   // Skip header on login and signup pages
-  const isAuthPage = pathname === "/login" || pathname === "/signup"
+  const isAuthPage =
+    pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password" || pathname === "/reset-password"
 
   // Navigation items based on user role
   const getNavItems = () => {
@@ -185,6 +186,75 @@ export default function Header() {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+
+                  {/* Mobile Menu Button */}
+                  <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                    <SheetTrigger asChild>
+                      <Button variant="ghost" size="icon" className="md:hidden">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle menu</span>
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-[80vw] sm:w-[350px]">
+                      <div className="flex flex-col space-y-6 py-6">
+                        <div className="flex items-center justify-between">
+                          <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                              <span className="text-lg font-bold">L</span>
+                            </div>
+                            <span className="ml-2 text-xl font-bold">Latih</span>
+                          </Link>
+                        </div>
+
+                        <div className="flex flex-col space-y-1 p-2 border-b pb-4">
+                          <p className="text-sm font-medium leading-none">{user.name}</p>
+                          <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                          <p className="text-xs text-primary mt-1 font-medium">
+                            {user.role === "admin" ? "Administrator" : "Learner"}
+                          </p>
+                        </div>
+
+                        {/* Mobile Navigation */}
+                        <nav className="flex flex-col space-y-1">
+                          {navItems.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                pathname === item.href || pathname.startsWith(item.href + "/")
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                              }`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <item.icon className="mr-2 h-4 w-4" />
+                              {item.name}
+                            </Link>
+                          ))}
+                        </nav>
+
+                        <div className="border-t pt-4 space-y-2">
+                          <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                            <Button variant="outline" className="w-full flex items-center justify-start">
+                              <User className="mr-2 h-4 w-4" />
+                              Profile
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="outline"
+                            className="w-full flex items-center justify-start text-red-500"
+                            onClick={() => {
+                              signOut()
+                              setIsMobileMenuOpen(false)
+                            }}
+                          >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Log Out
+                          </Button>
+                        </div>
+                      </div>
+                    </SheetContent>
+                  </Sheet>
                 </>
               ) : (
                 <>
@@ -199,6 +269,7 @@ export default function Header() {
                     </Link>
                   </div>
 
+                  {/* Mobile Menu Button for non-authenticated users */}
                   <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                     <SheetTrigger asChild>
                       <Button variant="ghost" size="icon" className="md:hidden">

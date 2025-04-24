@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,7 +20,7 @@ const certificationData = {
     id: "psm",
     name: "Professional Scrum Master (PSM)",
     description: "Learn the role and responsibilities of a Scrum Master in agile development",
-    image: "/images/psm-certification.jpg",
+    image: "/placeholder.svg?height=225&width=400&text=PSM",
     questionCount: 120,
     domains: [
       { id: "role", name: "Roles" },
@@ -38,7 +37,7 @@ const certificationData = {
     id: "pspo",
     name: "Professional Scrum Product Owner (PSPO)",
     description: "Master the skills needed to be an effective Product Owner in Scrum",
-    image: "/images/pspo-certification.jpg",
+    image: "/placeholder.svg?height=225&width=400&text=PSPO",
     questionCount: 95,
     domains: [
       { id: "role", name: "Roles" },
@@ -55,7 +54,7 @@ const certificationData = {
     id: "pmp",
     name: "Project Management Professional (PMP)",
     description: "Prepare for the globally recognized project management certification from PMI",
-    image: "/images/pmp-certification.jpg",
+    image: "/placeholder.svg?height=225&width=400&text=PMP",
     questionCount: 200,
     domains: [
       { id: "role", name: "Roles" },
@@ -155,20 +154,9 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
             </Button>
           </Link>
         </div>
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          <div className="w-full md:w-1/3 lg:w-1/4">
-            <Image
-              src={certification.image || "/placeholder.svg"}
-              alt={certification.name}
-              width={400}
-              height={225}
-              className="w-full rounded-lg shadow-md object-cover"
-            />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold">{certification.name}</h1>
-            <p className="text-muted-foreground mt-2">{certification.description}</p>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold">{certification.name}</h1>
+          <p className="text-muted-foreground mt-2">{certification.description}</p>
         </div>
       </div>
 

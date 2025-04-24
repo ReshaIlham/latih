@@ -16,9 +16,11 @@ type AuthContextType = {
   user: User | null
   isLoading: boolean
   isAdmin: boolean
-  signIn: (email: string, password: string) => Promise<void>
-  signUp: (name: string, email: string, password: string) => Promise<void>
+  signIn: (email: string, password: string) => Promise<User | null>
+  signUp: (name: string, email: string, password: string) => Promise<User | null>
   signOut: () => void
+  resetPassword: (token: string, newPassword: string) => Promise<void>
+  requestPasswordReset: (email: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -55,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }, [])
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<User | null> => {
     // Mock authentication - in a real app, this would call an API
     setIsLoading(true)
     try {
@@ -67,27 +69,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         (account) => account.email.toLowerCase() === email.toLowerCase() && account.password === password,
       )
 
+      let mockUser: User
+
       if (account) {
         // Use the example account
-        const mockUser: User = {
+        mockUser = {
           id: account.id,
           name: account.name,
           email: account.email,
           role: account.role,
         }
-        setUser(mockUser)
-        localStorage.setItem("latih-user", JSON.stringify(mockUser))
       } else {
         // For demo, create a mock user based on email
-        const mockUser: User = {
+        mockUser = {
           id: "user-" + Date.now(),
           name: email.split("@")[0],
           email,
           role: "learner",
         }
-        setUser(mockUser)
-        localStorage.setItem("latih-user", JSON.stringify(mockUser))
       }
+
+      setUser(mockUser)
+      localStorage.setItem("latih-user", JSON.stringify(mockUser))
+      return mockUser
     } catch (error) {
       console.error("Sign in failed:", error)
       throw error
@@ -96,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (name: string, email: string, password: string) => {
+  const signUp = async (name: string, email: string, password: string): Promise<User | null> => {
     // Mock sign up - in a real app, this would call an API
     setIsLoading(true)
     try {
@@ -112,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setUser(newUser)
       localStorage.setItem("latih-user", JSON.stringify(newUser))
+      return newUser
     } catch (error) {
       console.error("Sign up failed:", error)
       throw error
@@ -125,6 +130,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("latih-user")
   }
 
+  const requestPasswordReset = async (email: string): Promise<void> => {
+    // Mock password reset request
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // In a real app, this would send an email with a reset link
+      console.log(`Password reset requested for ${email}`)
+
+      // For demo purposes, we'll store the reset token in localStorage
+      const resetToken = `reset-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
+      localStorage.setItem(`reset-token-${email}`, resetToken)
+
+      // In a real app, this would send an email with the reset token
+    } catch (error) {
+      console.error("Password reset request failed:", error)
+      throw error
+    }
+  }
+
+  const resetPassword = async (token: string, newPassword: string): Promise<void> => {
+    // Mock password reset
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // In a real app, this would verify the token and update the password
+      console.log(`Password reset with token ${token}`)
+
+      // For demo purposes, we'll just log the action
+    } catch (error) {
+      console.error("Password reset failed:", error)
+      throw error
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -134,6 +175,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signOut,
+        requestPasswordReset,
+        resetPassword,
       }}
     >
       {children}

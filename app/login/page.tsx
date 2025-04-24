@@ -28,12 +28,18 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      await signIn(email, password)
+      const user = await signIn(email, password)
       toast({
         title: "Login successful",
         description: "Welcome back to Latih!",
       })
-      router.push("/my-certifications")
+
+      // Redirect admin users to admin dashboard, others to my-certifications
+      if (user?.role === "admin") {
+        router.push("/admin")
+      } else {
+        router.push("/my-certifications")
+      }
     } catch (error) {
       toast({
         title: "Login failed",

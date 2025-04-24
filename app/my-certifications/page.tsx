@@ -3,22 +3,12 @@
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { useAuth } from "@/lib/auth-provider"
 import { useSubscription } from "@/lib/subscription-provider"
-import {
-  ArrowRight,
-  BookOpen,
-  Clock,
-  BarChart3,
-  Trophy,
-  TrendingUp,
-  ListChecks,
-  LayoutGrid,
-  BookOpenCheck,
-} from "lucide-react"
+import { ArrowRight, BookOpen, Clock, BarChart3, Trophy, TrendingUp, ListChecks, LayoutGrid, Play } from "lucide-react"
 import { motion } from "framer-motion"
 
 // Mock data for the dashboard
@@ -29,6 +19,7 @@ const recentTests = [
     date: "2023-10-15",
     score: 85,
     type: "medium",
+    completed: true,
   },
   {
     id: "test-2",
@@ -36,6 +27,18 @@ const recentTests = [
     date: "2023-10-10",
     score: 92,
     type: "short",
+    completed: true,
+  },
+  {
+    id: "test-3",
+    certification: "Project Management Professional",
+    date: "2023-10-18",
+    progress: 65, // Progress percentage
+    type: "full",
+    completed: false,
+    questionsAnswered: 52,
+    totalQuestions: 80,
+    timeRemaining: "45 minutes",
   },
 ]
 
@@ -44,7 +47,7 @@ const recommendedCertifications = [
     id: "psm",
     title: "Professional Scrum Master (PSM)",
     description: "Learn the role and responsibilities of a Scrum Master in agile development",
-    progress: 65,
+    image: "/placeholder.svg?height=80&width=120&text=PSM",
     questionCount: 120,
     domainCount: 3,
     testTypeCount: 3,
@@ -53,7 +56,7 @@ const recommendedCertifications = [
     id: "pspo",
     title: "Professional Scrum Product Owner (PSPO)",
     description: "Master the skills needed to be an effective Product Owner in Scrum",
-    progress: 30,
+    image: "/placeholder.svg?height=80&width=120&text=PSPO",
     questionCount: 95,
     domainCount: 3,
     testTypeCount: 3,
@@ -218,22 +221,44 @@ export default function MyCertificationsPage() {
                         <span className="mx-2">•</span>
                         <span className="capitalize">{test.type} test</span>
                       </div>
+                      {!test.completed && (
+                        <div className="mt-1 text-xs text-primary">
+                          {test.questionsAnswered}/{test.totalQuestions} questions • {test.timeRemaining} remaining
+                        </div>
+                      )}
                     </div>
                     <div className="text-right">
-                      <div className="text-lg font-bold">
-                        <span
-                          className={
-                            test.score >= 80 ? "text-green-500" : test.score >= 60 ? "text-amber-500" : "text-red-500"
-                          }
-                        >
-                          {test.score}%
-                        </span>
-                      </div>
-                      <Link href={`/test-results/${test.id}`}>
-                        <Button variant="ghost" size="sm" className="hover:text-primary">
-                          View Details
-                        </Button>
-                      </Link>
+                      {test.completed ? (
+                        <>
+                          <div className="text-lg font-bold">
+                            <span
+                              className={
+                                test.score >= 80
+                                  ? "text-green-500"
+                                  : test.score >= 60
+                                    ? "text-amber-500"
+                                    : "text-red-500"
+                              }
+                            >
+                              {test.score}%
+                            </span>
+                          </div>
+                          <Link href={`/test-results/${test.id}`}>
+                            <Button variant="ghost" size="sm" className="hover:text-primary">
+                              View Details
+                            </Button>
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Link href={`/test?id=${test.id}&continue=true`}>
+                            <Button size="sm" className="gap-1">
+                              <Play className="h-3 w-3" />
+                              Continue
+                            </Button>
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -263,30 +288,18 @@ export default function MyCertificationsPage() {
               <div className="space-y-4">
                 {recommendedCertifications.map((cert) => (
                   <div key={cert.id} className="flex gap-3 rounded-lg p-3 transition-colors hover:bg-muted/50">
-                    <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-gradient-to-r from-primary/5 to-primary/10 flex items-center justify-center relative">
-                      <BookOpenCheck className="h-8 w-8 text-primary/30" />
-                      {/* Pattern overlay */}
-                      <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-0 left-0 w-full h-full">
-                          {Array.from({ length: 3 }).map((_, rowIndex) => (
-                            <div key={rowIndex} className="flex justify-around">
-                              {Array.from({ length: 3 }).map((_, colIndex) => (
-                                <div
-                                  key={`${rowIndex}-${colIndex}`}
-                                  className="w-4 h-4 m-1 rounded-full border border-primary/20"
-                                ></div>
-                              ))}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                    <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md">
+                      <Image
+                        src={cert.image || "/placeholder.svg"}
+                        alt={cert.title}
+                        width={120}
+                        height={80}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center justify-between">
                         <h3 className="font-medium">{cert.title}</h3>
-                        {cert.progress > 0 && (
-                          <span className="text-xs text-muted-foreground">{cert.progress}% complete</span>
-                        )}
                       </div>
                       <div className="flex flex-wrap gap-2 mb-1">
                         <div className="flex items-center text-xs text-muted-foreground">
@@ -302,13 +315,10 @@ export default function MyCertificationsPage() {
                           <span>{cert.testTypeCount} Test Types</span>
                         </div>
                       </div>
-                      {cert.progress > 0 && (
-                        <Progress value={cert.progress} className="h-1" aria-label={`${cert.progress}% complete`} />
-                      )}
                       <div className="flex justify-end">
                         <Link href={`/certifications/${cert.id}`}>
                           <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
-                            Continue
+                            Start Practicing
                             <ArrowRight className="h-4 w-4" />
                           </Button>
                         </Link>

@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { BookOpen, ListChecks, LayoutGrid, BookOpenCheck } from "lucide-react"
+import Image from "next/image"
+import { BookOpen, ListChecks, LayoutGrid } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
@@ -9,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 interface CertificationCardProps {
   id: string
   title: string
-  image: string // We'll ignore this but keep it for compatibility
+  image: string
   description: string
   questionCount: number
   domainCount: number
@@ -38,47 +39,27 @@ export function CertificationCard({
     >
       <div className="relative">
         {isComingSoon ? (
-          <div className="w-full h-48 relative bg-gradient-to-r from-primary/5 to-primary/10 flex items-center justify-center">
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <BookOpenCheck className="h-16 w-16 text-primary/30 mb-2" />
+          <div className="w-full h-48 relative">
+            <Image
+              src="/placeholder.svg?height=200&width=360&text=Coming+Soon"
+              alt={title}
+              width={360}
+              height={200}
+              className="w-full h-48 object-cover filter grayscale opacity-70"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
               <Badge className="bg-primary text-primary-foreground text-sm px-3 py-1">Coming Soon</Badge>
-            </div>
-            {/* Pattern overlay */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-full h-full">
-                {Array.from({ length: 5 }).map((_, rowIndex) => (
-                  <div key={rowIndex} className="flex justify-around">
-                    {Array.from({ length: 5 }).map((_, colIndex) => (
-                      <div
-                        key={`${rowIndex}-${colIndex}`}
-                        className="w-8 h-8 m-2 rounded-full border border-primary/20"
-                      ></div>
-                    ))}
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         ) : (
           <Link href={`/certifications/${id}`} className="block">
-            <div className="w-full h-48 bg-gradient-to-r from-primary/5 to-primary/10 flex items-center justify-center relative">
-              <BookOpenCheck className="h-16 w-16 text-primary/30" />
-              {/* Pattern overlay */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 left-0 w-full h-full">
-                  {Array.from({ length: 5 }).map((_, rowIndex) => (
-                    <div key={rowIndex} className="flex justify-around">
-                      {Array.from({ length: 5 }).map((_, colIndex) => (
-                        <div
-                          key={`${rowIndex}-${colIndex}`}
-                          className="w-8 h-8 m-2 rounded-full border border-primary/20"
-                        ></div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <Image
+              src={`/placeholder.svg?height=200&width=360&text=${encodeURIComponent(title)}`}
+              alt={title}
+              width={360}
+              height={200}
+              className="w-full h-48 object-cover"
+            />
           </Link>
         )}
       </div>
