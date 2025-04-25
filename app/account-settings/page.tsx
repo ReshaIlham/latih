@@ -21,6 +21,7 @@ export default function AccountSettingsPage() {
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -36,6 +37,7 @@ export default function AccountSettingsPage() {
     } else if (user) {
       setName(user.name || "")
       setEmail(user.email || "")
+      setPhone(user.phone || "")
       setResetEmail(user.email || "")
     }
   }, [user, isLoading, router])
@@ -188,6 +190,16 @@ export default function AccountSettingsPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Your email address"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Your phone number"
                     />
                   </div>
                 </div>

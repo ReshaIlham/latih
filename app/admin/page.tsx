@@ -4,7 +4,8 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/lib/auth-provider"
 import {
   Users,
@@ -13,16 +14,31 @@ import {
   TrendingUp,
   BookOpen,
   Award,
-  AlertTriangle,
-  CheckCircle,
   BookOpenCheck,
+  Brain,
+  Clock,
+  User,
+  CheckCircle,
 } from "lucide-react"
+import {
+  Line,
+  LineChart,
+  Bar,
+  BarChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts"
+import { ChartContainer } from "@/components/ui/chart"
 
 // Mock data for the admin dashboard
 const platformStats = {
+  dailyActiveUsers: 875,
+  activeUsersChange: 42,
   totalUsers: 1250,
-  activeUsers: 875,
-  newUsersThisWeek: 42,
   totalCertifications: 8,
   totalQuestions: 450,
   totalTestsTaken: 3280,
@@ -31,39 +47,142 @@ const platformStats = {
   conversionRate: 25.6, // percentage
 }
 
-const recentUsers = [
-  { id: "user-1", name: "John Doe", email: "john@example.com", joined: "2023-10-15", role: "learner" },
-  { id: "user-2", name: "Jane Smith", email: "jane@example.com", joined: "2023-10-14", role: "learner" },
-  { id: "user-3", name: "Robert Johnson", email: "robert@example.com", joined: "2023-10-12", role: "admin" },
+// Monthly new users data
+const newUsersData = [
+  { month: "Jan", users: 120 },
+  { month: "Feb", users: 150 },
+  { month: "Mar", users: 180 },
+  { month: "Apr", users: 220 },
+  { month: "May", users: 250 },
+  { month: "Jun", users: 280 },
+  { month: "Jul", users: 310 },
+  { month: "Aug", users: 340 },
+  { month: "Sep", users: 370 },
+  { month: "Oct", users: 400 },
+  { month: "Nov", users: 430 },
+  { month: "Dec", users: 460 },
+]
+
+// Monthly active users data
+const activeUsersData = [
+  { month: "Jan", users: 80 },
+  { month: "Feb", users: 110 },
+  { month: "Mar", users: 140 },
+  { month: "Apr", users: 170 },
+  { month: "May", users: 200 },
+  { month: "Jun", users: 230 },
+  { month: "Jul", users: 260 },
+  { month: "Aug", users: 290 },
+  { month: "Sep", users: 320 },
+  { month: "Oct", users: 350 },
+  { month: "Nov", users: 380 },
+  { month: "Dec", users: 410 },
+]
+
+// Monthly tests per certification data
+const testsPerCertificationData = [
+  { month: "Jan", PSM: 45, PSPO: 30, PMP: 20 },
+  { month: "Feb", PSM: 50, PSPO: 35, PMP: 25 },
+  { month: "Mar", PSM: 55, PSPO: 40, PMP: 30 },
+  { month: "Apr", PSM: 60, PSPO: 45, PMP: 35 },
+  { month: "May", PSM: 65, PSPO: 50, PMP: 40 },
+  { month: "Jun", PSM: 70, PSPO: 55, PMP: 45 },
+  { month: "Jul", PSM: 75, PSPO: 60, PMP: 50 },
+  { month: "Aug", PSM: 80, PSPO: 65, PMP: 55 },
+  { month: "Sep", PSM: 85, PSPO: 70, PMP: 60 },
+  { month: "Oct", PSM: 90, PSPO: 75, PMP: 65 },
+  { month: "Nov", PSM: 95, PSPO: 80, PMP: 70 },
+  { month: "Dec", PSM: 100, PSPO: 85, PMP: 75 },
+]
+
+// Monthly free vs premium users data
+const userTypeData = [
+  { month: "Jan", free: 90, premium: 30 },
+  { month: "Feb", free: 100, premium: 50 },
+  { month: "Mar", free: 110, premium: 70 },
+  { month: "Apr", free: 120, premium: 90 },
+  { month: "May", free: 130, premium: 110 },
+  { month: "Jun", free: 140, premium: 130 },
+  { month: "Jul", free: 150, premium: 150 },
+  { month: "Aug", free: 160, premium: 170 },
+  { month: "Sep", free: 170, premium: 190 },
+  { month: "Oct", free: 180, premium: 210 },
+  { month: "Nov", free: 190, premium: 230 },
+  { month: "Dec", free: 200, premium: 250 },
 ]
 
 const certificationStats = [
-  { name: "Scrum Master", questions: 120, users: 450, passRate: 68 },
-  { name: "Product Owner", questions: 95, users: 320, passRate: 72 },
-  { name: "Agile Coach", questions: 75, users: 180, passRate: 65 },
-]
-
-const alertItems = [
   {
-    id: "alert-1",
-    type: "warning",
-    message: "Low pass rate for Agile Coach certification",
-    details: "Pass rate has dropped below 70%",
-    date: "2023-10-16",
+    id: "cert-1",
+    name: "Professional Scrum Master",
+    questions: 120,
+    domains: [
+      { name: "Role", questions: 40 },
+      { name: "Artifacts", questions: 40 },
+      { name: "Events", questions: 40 },
+    ],
+    averageScore: 68,
+    domainScores: [
+      { name: "Role", score: 72 },
+      { name: "Artifacts", score: 65 },
+      { name: "Events", score: 67 },
+    ],
+    testsTaken: 450,
+    testTypes: [
+      { type: "Short", count: 200 },
+      { type: "Medium", count: 150 },
+      { type: "Full", count: 100 },
+    ],
+    users: 320,
+    premiumUsers: 180,
   },
   {
-    id: "alert-2",
-    type: "info",
-    message: "New certification ready for review",
-    details: "DevOps certification needs approval",
-    date: "2023-10-15",
+    id: "cert-2",
+    name: "Professional Scrum Product Owner",
+    questions: 95,
+    domains: [
+      { name: "Role", questions: 30 },
+      { name: "Artifacts", questions: 35 },
+      { name: "Events", questions: 30 },
+    ],
+    averageScore: 72,
+    domainScores: [
+      { name: "Role", score: 75 },
+      { name: "Artifacts", score: 70 },
+      { name: "Events", score: 71 },
+    ],
+    testsTaken: 320,
+    testTypes: [
+      { type: "Short", count: 150 },
+      { type: "Medium", count: 120 },
+      { type: "Full", count: 50 },
+    ],
+    users: 240,
+    premiumUsers: 140,
   },
   {
-    id: "alert-3",
-    type: "success",
-    message: "User milestone reached",
-    details: "Platform has reached 1,000+ registered users",
-    date: "2023-10-14",
+    id: "cert-3",
+    name: "Project Management Professional",
+    questions: 75,
+    domains: [
+      { name: "Role", questions: 25 },
+      { name: "Artifacts", questions: 25 },
+      { name: "Events", questions: 25 },
+    ],
+    averageScore: 65,
+    domainScores: [
+      { name: "Role", score: 68 },
+      { name: "Artifacts", score: 64 },
+      { name: "Events", score: 62 },
+    ],
+    testsTaken: 180,
+    testTypes: [
+      { type: "Short", count: 80 },
+      { type: "Medium", count: 70 },
+      { type: "Full", count: 30 },
+    ],
+    users: 120,
+    premiumUsers: 70,
   },
 ]
 
@@ -95,18 +214,18 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid gap-6 mb-8 md:grid-cols-4">
-          {/* Platform Overview Cards */}
-          <Card className="bg-primary/5 border-primary/20">
+          {/* Platform Overview Cards - Removed special styling from Daily Active Users */}
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center">
                 <Users className="mr-2 h-4 w-4 text-primary" />
-                Total Users
+                Daily Active Users
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{platformStats.totalUsers.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{platformStats.dailyActiveUsers.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground flex items-center">
-                <TrendingUp className="mr-1 h-3 w-3 text-green-500" />+{platformStats.newUsersThisWeek} this week
+                <TrendingUp className="mr-1 h-3 w-3 text-green-500" />+{platformStats.activeUsersChange} this week
               </p>
             </CardContent>
           </Card>
@@ -145,139 +264,318 @@ export default function AdminDashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{platformStats.premiumUsers}</div>
+              <div className="text-2xl font-bold">
+                {platformStats.premiumUsers} / {platformStats.totalUsers}
+              </div>
               <p className="text-xs text-muted-foreground">{platformStats.conversionRate}% conversion rate</p>
             </CardContent>
           </Card>
         </div>
 
         <div className="space-y-8">
-          {/* Alerts Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Important Alerts</CardTitle>
-              <CardDescription>Issues that need your attention</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {alertItems.map((alert) => (
-                  <div
-                    key={alert.id}
-                    className={`flex items-start gap-3 p-3 rounded-lg ${
-                      alert.type === "warning"
-                        ? "bg-amber-50 text-amber-800"
-                        : alert.type === "success"
-                          ? "bg-green-50 text-green-800"
-                          : "bg-blue-50 text-blue-800"
-                    }`}
-                  >
-                    <div className="mt-0.5">
-                      {alert.type === "warning" ? (
-                        <AlertTriangle className="h-5 w-5" />
-                      ) : alert.type === "success" ? (
-                        <CheckCircle className="h-5 w-5" />
-                      ) : (
-                        <BookOpenCheck className="h-5 w-5" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">{alert.message}</p>
-                      <p className="text-sm opacity-80">{alert.details}</p>
-                      <p className="text-xs mt-1 opacity-70">{new Date(alert.date).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                View All Alerts
-              </Button>
-            </CardFooter>
-          </Card>
+          {/* Charts Section - Added explicit tooltips */}
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* New Users Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>New Users per Month</CardTitle>
+                <CardDescription>Growth trend of new user registrations</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    users: {
+                      label: "New Users",
+                      color: "hsl(var(--chart-1))",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={newUsersData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "8px",
+                          padding: "10px",
+                        }}
+                        labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
+                      />
+                      <Line type="monotone" dataKey="users" stroke="var(--color-users)" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
 
-          {/* Recent Users */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Users</CardTitle>
-              <CardDescription>New users who joined recently</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          user.role === "admin" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {user.role === "admin" ? "Admin" : "Learner"}
-                      </span>
-                      <div className="text-sm text-muted-foreground">
-                        Joined {new Date(user.joined).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Link href="/admin/users">
-                <Button variant="outline" className="w-full">
-                  View All Users
-                </Button>
-              </Link>
-            </CardFooter>
-          </Card>
+            {/* Active Users Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Active Users per Month</CardTitle>
+                <CardDescription>Monthly active user engagement</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    users: {
+                      label: "Active Users",
+                      color: "hsl(var(--chart-2))",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={activeUsersData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "8px",
+                          padding: "10px",
+                        }}
+                        labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
+                      />
+                      <Line type="monotone" dataKey="users" stroke="var(--color-users)" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
 
-          {/* Certification Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Certification Statistics</CardTitle>
-              <CardDescription>Overview of certifications and usage</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {certificationStats.map((cert, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">{cert.name}</p>
-                      <div className="flex items-center gap-4">
-                        <span className="flex items-center text-sm text-muted-foreground">
-                          <FileQuestion className="mr-1 h-4 w-4" />
-                          {cert.questions} questions
-                        </span>
-                        <span className="flex items-center text-sm text-muted-foreground">
-                          <Users className="mr-1 h-4 w-4" />
-                          {cert.users} users
-                        </span>
-                        <span
-                          className={`flex items-center text-sm ${
-                            cert.passRate >= 70 ? "text-green-600" : "text-amber-600"
-                          }`}
-                        >
-                          <Award className="mr-1 h-4 w-4" />
-                          {cert.passRate}% pass rate
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
+            {/* Tests per Certification Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Tests per Certification</CardTitle>
+                <CardDescription>Monthly test attempts by certification</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    PSM: {
+                      label: "Professional Scrum Master",
+                      color: "hsl(var(--chart-1))",
+                    },
+                    PSPO: {
+                      label: "Professional Scrum Product Owner",
+                      color: "hsl(var(--chart-2))",
+                    },
+                    PMP: {
+                      label: "Project Management Professional",
+                      color: "hsl(var(--chart-3))",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={testsPerCertificationData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "8px",
+                          padding: "10px",
+                        }}
+                        labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
+                      />
+                      <Legend />
+                      <Bar dataKey="PSM" fill="var(--color-PSM)" />
+                      <Bar dataKey="PSPO" fill="var(--color-PSPO)" />
+                      <Bar dataKey="PMP" fill="var(--color-PMP)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            {/* Free vs Premium Users Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Free vs Premium Users</CardTitle>
+                <CardDescription>Monthly distribution of user types</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    free: {
+                      label: "Free Users",
+                      color: "hsl(var(--chart-4))",
+                    },
+                    premium: {
+                      label: "Premium Users",
+                      color: "hsl(var(--chart-5))",
+                    },
+                  }}
+                  className="h-[300px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={userTypeData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "8px",
+                          padding: "10px",
+                        }}
+                        labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
+                      />
+                      <Legend />
+                      <Bar dataKey="free" fill="var(--color-free)" />
+                      <Bar dataKey="premium" fill="var(--color-premium)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Certification Stats - Redesigned with a more attractive style */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Certification Statistics</h2>
               <Link href="/admin/certifications">
-                <Button variant="outline" className="w-full">
-                  Manage Certifications
-                </Button>
+                <Button variant="outline">View All Certifications</Button>
               </Link>
-            </CardFooter>
-          </Card>
+            </div>
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+              {certificationStats.map((cert) => (
+                <Card key={cert.id} className="overflow-hidden border-none shadow-lg">
+                  <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
+                    <h3 className="text-xl font-bold text-primary">{cert.name}</h3>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      <Badge variant="secondary" className="bg-white/80 text-primary">
+                        <FileQuestion className="mr-1 h-3 w-3" />
+                        {cert.questions} questions
+                      </Badge>
+                      <Badge variant="secondary" className="bg-white/80 text-primary">
+                        <Award className="mr-1 h-3 w-3" />
+                        {cert.averageScore}% avg score
+                      </Badge>
+                      <Badge variant="secondary" className="bg-white/80 text-primary">
+                        <BookOpenCheck className="mr-1 h-3 w-3" />
+                        {cert.testsTaken} tests
+                      </Badge>
+                      <Badge variant="secondary" className="bg-white/80 text-primary">
+                        <Users className="mr-1 h-3 w-3" />
+                        {cert.users} users
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="text-sm font-semibold mb-3 flex items-center text-primary">
+                            <Brain className="mr-2 h-4 w-4" />
+                            Domain Distribution
+                          </h4>
+                          <div className="space-y-2">
+                            {cert.domains.map((domain, idx) => (
+                              <div key={idx} className="flex items-center justify-between">
+                                <span className="text-sm">{domain.name}</span>
+                                <div className="flex items-center">
+                                  <span className="text-sm font-medium">{domain.questions}</span>
+                                  <span className="text-xs text-muted-foreground ml-1">questions</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="text-sm font-semibold mb-3 flex items-center text-primary">
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            Domain Performance
+                          </h4>
+                          <div className="space-y-2">
+                            {cert.domainScores.map((score, idx) => (
+                              <div key={idx}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-sm">{score.name}</span>
+                                  <span className="text-sm font-medium">{score.score}%</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                  <div
+                                    className="bg-primary h-1.5 rounded-full"
+                                    style={{ width: `${score.score}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="text-sm font-semibold mb-3 flex items-center text-primary">
+                            <Clock className="mr-2 h-4 w-4" />
+                            Test Types
+                          </h4>
+                          <div className="space-y-3">
+                            {cert.testTypes.map((type, idx) => (
+                              <div key={idx}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <div className="flex items-center">
+                                    <CheckCircle className="h-3 w-3 mr-1.5 text-primary" />
+                                    <span className="text-sm">{type.type}</span>
+                                  </div>
+                                  <span className="text-sm font-medium">{type.count}</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                  <div
+                                    className="bg-primary h-1.5 rounded-full"
+                                    style={{ width: `${(type.count / cert.testsTaken) * 100}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h4 className="text-sm font-semibold mb-3 flex items-center text-primary">
+                            <User className="mr-2 h-4 w-4" />
+                            User Statistics
+                          </h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-2xl font-bold text-primary">{cert.users}</div>
+                              <div className="text-xs text-muted-foreground">Total Users</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-2xl font-bold text-primary">{cert.premiumUsers}</div>
+                              <div className="text-xs text-muted-foreground">Premium Users</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-2xl font-bold text-primary">{cert.testsTaken}</div>
+                              <div className="text-xs text-muted-foreground">Tests Taken</div>
+                            </div>
+                            <div className="bg-white p-3 rounded-lg text-center">
+                              <div className="text-2xl font-bold text-primary">{cert.averageScore}%</div>
+                              <div className="text-xs text-muted-foreground">Avg. Score</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

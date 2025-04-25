@@ -9,7 +9,8 @@ type User = {
   name: string | null
   email: string
   image?: string | null
-  role: "admin" | "learner"
+  role: "admin" | "learner" | "user"
+  phoneNumber?: string
 }
 
 type AuthContextType = {
@@ -17,7 +18,7 @@ type AuthContextType = {
   isLoading: boolean
   isAdmin: boolean
   signIn: (email: string, password: string) => Promise<User | null>
-  signUp: (name: string, email: string, password: string) => Promise<User | null>
+  signUp: (name: string, email: string, phoneNumber: string, password: string) => Promise<User | null>
   signOut: () => void
   resetPassword: (token: string, newPassword: string) => Promise<void>
   requestPasswordReset: (email: string) => Promise<void>
@@ -100,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (name: string, email: string, password: string): Promise<User | null> => {
+  const signUp = async (name: string, email: string, phoneNumber: string, password: string): Promise<User | null> => {
     // Mock sign up - in a real app, this would call an API
     setIsLoading(true)
     try {
@@ -111,7 +112,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         id: "user-" + Date.now(),
         name,
         email,
-        role: "learner", // Default role for new users
+        phoneNumber,
+        role: "user", // Default role for new users
       }
 
       setUser(newUser)

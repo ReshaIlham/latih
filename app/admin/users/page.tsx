@@ -47,6 +47,7 @@ const mockUsers = [
     id: "user-1",
     name: "John Doe",
     email: "john@example.com",
+    phone: "+1 (555) 123-4567",
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-05-15T14:30:45",
@@ -55,6 +56,7 @@ const mockUsers = [
     id: "user-2",
     name: "Jane Smith",
     email: "jane@example.com",
+    phone: "+1 (555) 987-6543",
     role: "learner",
     plan: "free",
     lastUpdated: "2023-06-22T09:15:22",
@@ -63,6 +65,7 @@ const mockUsers = [
     id: "user-3",
     name: "Robert Johnson",
     email: "robert@example.com",
+    phone: "+1 (555) 456-7890",
     role: "admin",
     plan: "premium",
     lastUpdated: "2023-01-10T11:45:30",
@@ -71,6 +74,7 @@ const mockUsers = [
     id: "user-4",
     name: "Emily Davis",
     email: "emily@example.com",
+    phone: "+1 (555) 234-5678",
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-07-05T16:20:10",
@@ -79,6 +83,7 @@ const mockUsers = [
     id: "user-5",
     name: "Michael Wilson",
     email: "michael@example.com",
+    phone: "+1 (555) 876-5432",
     role: "learner",
     plan: "free",
     lastUpdated: "2023-08-17T08:55:42",
@@ -87,6 +92,7 @@ const mockUsers = [
     id: "user-6",
     name: "Sarah Brown",
     email: "sarah@example.com",
+    phone: "+1 (555) 345-6789",
     role: "admin",
     plan: "premium",
     lastUpdated: "2023-03-28T13:10:05",
@@ -95,6 +101,7 @@ const mockUsers = [
     id: "user-7",
     name: "David Miller",
     email: "david@example.com",
+    phone: "+1 (555) 654-3210",
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-09-14T10:30:15",
@@ -103,6 +110,7 @@ const mockUsers = [
     id: "user-8",
     name: "Lisa Anderson",
     email: "lisa@example.com",
+    phone: "+1 (555) 789-0123",
     role: "learner",
     plan: "free",
     lastUpdated: "2023-02-19T15:45:33",
@@ -111,6 +119,7 @@ const mockUsers = [
     id: "admin-1",
     name: "Admin User",
     email: "admin@latih.com",
+    phone: "+1 (555) 111-2222",
     role: "admin",
     plan: "premium",
     lastUpdated: "2022-10-05T09:20:18",
@@ -119,6 +128,7 @@ const mockUsers = [
     id: "learner-1",
     name: "Learner User",
     email: "learner@latih.com",
+    phone: "+1 (555) 333-4444",
     role: "learner",
     plan: "free",
     lastUpdated: "2023-04-12T14:25:50",
@@ -127,6 +137,7 @@ const mockUsers = [
     id: "user-9",
     name: "Thomas Wright",
     email: "thomas@example.com",
+    phone: "+1 (555) 555-6666",
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-10-01T11:22:33",
@@ -135,6 +146,7 @@ const mockUsers = [
     id: "user-10",
     name: "Jessica Lee",
     email: "jessica@example.com",
+    phone: "+1 (555) 777-8888",
     role: "learner",
     plan: "free",
     lastUpdated: "2023-10-05T16:42:10",
@@ -143,6 +155,7 @@ const mockUsers = [
     id: "user-11",
     name: "Kevin Chen",
     email: "kevin@example.com",
+    phone: "+1 (555) 999-0000",
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-10-10T09:15:27",
@@ -151,6 +164,7 @@ const mockUsers = [
     id: "user-12",
     name: "Amanda Taylor",
     email: "amanda@example.com",
+    phone: "+1 (555) 222-3333",
     role: "admin",
     plan: "premium",
     lastUpdated: "2023-10-15T14:30:45",
@@ -161,6 +175,7 @@ type User = {
   id: string
   name: string
   email: string
+  phone: string
   role: "admin" | "learner"
   plan: "free" | "premium"
   lastUpdated: string
@@ -180,6 +195,7 @@ export default function UserManagementPage() {
   const [newUser, setNewUser] = useState<Omit<User, "id" | "lastUpdated">>({
     name: "",
     email: "",
+    phone: "",
     role: "learner",
     plan: "free",
   })
@@ -209,7 +225,8 @@ export default function UserManagementPage() {
     .filter((user) => {
       const matchesSearch =
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.phone.toLowerCase().includes(searchTerm.toLowerCase())
 
       const matchesRole = roleFilter === "all" || user.role === roleFilter
       const matchesPlan = planFilter === "all" || user.plan === planFilter
@@ -310,6 +327,7 @@ export default function UserManagementPage() {
         id: newUserId,
         name: newUser.name,
         email: newUser.email,
+        phone: newUser.phone,
         role: newUser.role,
         plan: newUser.plan,
         lastUpdated: now,
@@ -320,6 +338,7 @@ export default function UserManagementPage() {
       setNewUser({
         name: "",
         email: "",
+        phone: "",
         role: "learner",
         plan: "free",
       })
@@ -440,6 +459,16 @@ export default function UserManagementPage() {
                 />
               </div>
               <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={newUser.phone}
+                  onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
+                  placeholder="Phone Number"
+                />
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="role">Role</Label>
                 <Select
                   value={newUser.role}
@@ -489,6 +518,7 @@ export default function UserManagementPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Phone Number</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Plan</TableHead>
               <TableHead>Last Updated</TableHead>
@@ -501,6 +531,7 @@ export default function UserManagementPage() {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.phone}</TableCell>
                   <TableCell>
                     <Badge
                       variant={user.role === "admin" ? "default" : "outline"}
@@ -573,7 +604,7 @@ export default function UserManagementPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   No users found.
                 </TableCell>
               </TableRow>
@@ -665,6 +696,15 @@ export default function UserManagementPage() {
                   type="email"
                   value={editUser.email}
                   onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-phone">Phone Number</Label>
+                <Input
+                  id="edit-phone"
+                  type="tel"
+                  value={editUser.phone}
+                  onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
                 />
               </div>
               <div className="grid gap-2">

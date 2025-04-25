@@ -16,6 +16,7 @@ import { motion } from "framer-motion"
 export default function SignupPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -38,7 +39,7 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      await signUp(name, email, password)
+      await signUp(name, email, phoneNumber, password)
       toast({
         title: "Account created",
         description: "Welcome to Latih! Your account has been created successfully.",
@@ -97,6 +98,17 @@ export default function SignupPage() {
                   placeholder="m@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="+1234567890"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                   required
                 />
               </div>
