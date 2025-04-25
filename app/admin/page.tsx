@@ -32,7 +32,6 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts"
-import { ChartContainer } from "@/components/ui/chart"
 
 // Mock data for the admin dashboard
 const platformStats = {
@@ -110,6 +109,17 @@ const userTypeData = [
   { month: "Nov", free: 190, premium: 230 },
   { month: "Dec", free: 200, premium: 250 },
 ]
+
+// Define chart colors directly
+const chartColors = {
+  users: "#D84040", // Primary red color
+  activeUsers: "#E86464", // Lighter red
+  PSM: "#D84040", // Primary red
+  PSPO: "#F0A0A0", // Light red
+  PMP: "#AA3030", // Dark red
+  free: "#A0A0A0", // Gray
+  premium: "#D84040", // Primary red
+}
 
 const certificationStats = [
   {
@@ -214,7 +224,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid gap-6 mb-8 md:grid-cols-4">
-          {/* Platform Overview Cards - Removed special styling from Daily Active Users */}
+          {/* Platform Overview Cards */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center">
@@ -273,7 +283,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="space-y-8">
-          {/* Charts Section - Added explicit tooltips */}
+          {/* Charts Section - Using direct color values */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* New Users Chart */}
             <Card>
@@ -282,15 +292,7 @@ export default function AdminDashboardPage() {
                 <CardDescription>Growth trend of new user registrations</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  config={{
-                    users: {
-                      label: "New Users",
-                      color: "hsl(var(--chart-1))",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
+                <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={newUsersData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -305,10 +307,17 @@ export default function AdminDashboardPage() {
                         }}
                         labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
                       />
-                      <Line type="monotone" dataKey="users" stroke="var(--color-users)" strokeWidth={2} />
+                      <Line
+                        type="monotone"
+                        dataKey="users"
+                        name="New Users"
+                        stroke={chartColors.users}
+                        strokeWidth={2}
+                        dot={{ fill: chartColors.users }}
+                      />
                     </LineChart>
                   </ResponsiveContainer>
-                </ChartContainer>
+                </div>
               </CardContent>
             </Card>
 
@@ -319,15 +328,7 @@ export default function AdminDashboardPage() {
                 <CardDescription>Monthly active user engagement</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  config={{
-                    users: {
-                      label: "Active Users",
-                      color: "hsl(var(--chart-2))",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
+                <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={activeUsersData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -342,10 +343,17 @@ export default function AdminDashboardPage() {
                         }}
                         labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
                       />
-                      <Line type="monotone" dataKey="users" stroke="var(--color-users)" strokeWidth={2} />
+                      <Line
+                        type="monotone"
+                        dataKey="users"
+                        name="Active Users"
+                        stroke={chartColors.activeUsers}
+                        strokeWidth={2}
+                        dot={{ fill: chartColors.activeUsers }}
+                      />
                     </LineChart>
                   </ResponsiveContainer>
-                </ChartContainer>
+                </div>
               </CardContent>
             </Card>
 
@@ -356,23 +364,7 @@ export default function AdminDashboardPage() {
                 <CardDescription>Monthly test attempts by certification</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  config={{
-                    PSM: {
-                      label: "Professional Scrum Master",
-                      color: "hsl(var(--chart-1))",
-                    },
-                    PSPO: {
-                      label: "Professional Scrum Product Owner",
-                      color: "hsl(var(--chart-2))",
-                    },
-                    PMP: {
-                      label: "Project Management Professional",
-                      color: "hsl(var(--chart-3))",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
+                <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={testsPerCertificationData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -388,12 +380,12 @@ export default function AdminDashboardPage() {
                         labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
                       />
                       <Legend />
-                      <Bar dataKey="PSM" fill="var(--color-PSM)" />
-                      <Bar dataKey="PSPO" fill="var(--color-PSPO)" />
-                      <Bar dataKey="PMP" fill="var(--color-PMP)" />
+                      <Bar dataKey="PSM" name="Professional Scrum Master" fill={chartColors.PSM} />
+                      <Bar dataKey="PSPO" name="Professional Scrum Product Owner" fill={chartColors.PSPO} />
+                      <Bar dataKey="PMP" name="Project Management Professional" fill={chartColors.PMP} />
                     </BarChart>
                   </ResponsiveContainer>
-                </ChartContainer>
+                </div>
               </CardContent>
             </Card>
 
@@ -404,19 +396,7 @@ export default function AdminDashboardPage() {
                 <CardDescription>Monthly distribution of user types</CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  config={{
-                    free: {
-                      label: "Free Users",
-                      color: "hsl(var(--chart-4))",
-                    },
-                    premium: {
-                      label: "Premium Users",
-                      color: "hsl(var(--chart-5))",
-                    },
-                  }}
-                  className="h-[300px]"
-                >
+                <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={userTypeData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -432,16 +412,16 @@ export default function AdminDashboardPage() {
                         labelStyle={{ fontWeight: "bold", marginBottom: "5px" }}
                       />
                       <Legend />
-                      <Bar dataKey="free" fill="var(--color-free)" />
-                      <Bar dataKey="premium" fill="var(--color-premium)" />
+                      <Bar dataKey="free" name="Free Users" fill={chartColors.free} />
+                      <Bar dataKey="premium" name="Premium Users" fill={chartColors.premium} />
                     </BarChart>
                   </ResponsiveContainer>
-                </ChartContainer>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Certification Stats - Redesigned with a more attractive style */}
+          {/* Certification Stats */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold">Certification Statistics</h2>
