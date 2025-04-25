@@ -5,10 +5,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth-provider"
 import {
-  PlusCircle,
   Users,
   FileQuestion,
   BarChart3,
@@ -17,9 +15,7 @@ import {
   Award,
   AlertTriangle,
   CheckCircle,
-  UserPlus,
   BookOpenCheck,
-  Settings,
 } from "lucide-react"
 
 // Mock data for the admin dashboard
@@ -91,78 +87,71 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="container py-10">
-      <div className="mb-8 space-y-4">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Manage certifications, questions, and user accounts</p>
-      </div>
+    <div className="bg-gray-50 min-h-screen pb-10">
+      <div className="container py-6">
+        <div className="mb-8 space-y-4">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-muted-foreground">Manage certifications, questions, and user accounts</p>
+        </div>
 
-      <div className="grid gap-6 mb-8 md:grid-cols-4">
-        {/* Platform Overview Cards */}
-        <Card className="bg-primary/5 border-primary/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Users className="mr-2 h-4 w-4 text-primary" />
-              Total Users
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{platformStats.totalUsers.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground flex items-center">
-              <TrendingUp className="mr-1 h-3 w-3 text-green-500" />+{platformStats.newUsersThisWeek} this week
-            </p>
-          </CardContent>
-        </Card>
+        <div className="grid gap-6 mb-8 md:grid-cols-4">
+          {/* Platform Overview Cards */}
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <Users className="mr-2 h-4 w-4 text-primary" />
+                Total Users
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{platformStats.totalUsers.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground flex items-center">
+                <TrendingUp className="mr-1 h-3 w-3 text-green-500" />+{platformStats.newUsersThisWeek} this week
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <BookOpen className="mr-2 h-4 w-4 text-primary" />
-              Certifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{platformStats.totalCertifications}</div>
-            <p className="text-xs text-muted-foreground">{platformStats.totalQuestions} questions total</p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <BookOpen className="mr-2 h-4 w-4 text-primary" />
+                Certifications
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{platformStats.totalCertifications}</div>
+              <p className="text-xs text-muted-foreground">{platformStats.totalQuestions} questions total</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Award className="mr-2 h-4 w-4 text-primary" />
-              Tests Taken
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{platformStats.totalTestsTaken.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">{platformStats.averageScore}% average score</p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <Award className="mr-2 h-4 w-4 text-primary" />
+                Tests Taken
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{platformStats.totalTestsTaken.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">{platformStats.averageScore}% average score</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <BarChart3 className="mr-2 h-4 w-4 text-primary" />
-              Premium Users
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{platformStats.premiumUsers}</div>
-            <p className="text-xs text-muted-foreground">{platformStats.conversionRate}% conversion rate</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium flex items-center">
+                <BarChart3 className="mr-2 h-4 w-4 text-primary" />
+                Premium Users
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{platformStats.premiumUsers}</div>
+              <p className="text-xs text-muted-foreground">{platformStats.conversionRate}% conversion rate</p>
+            </CardContent>
+          </Card>
+        </div>
 
-      <Tabs defaultValue="overview" className="space-y-8">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="certifications">Certifications</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-8">
+        <div className="space-y-8">
           {/* Alerts Section */}
           <Card>
             <CardHeader>
@@ -289,131 +278,8 @@ export default function AdminDashboardPage() {
               </Link>
             </CardFooter>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="certifications" className="space-y-6">
-          <div className="flex justify-between">
-            <h2 className="text-xl font-bold">Manage Certifications</h2>
-            <Link href="/admin/certifications/new">
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Certification
-              </Button>
-            </Link>
-          </div>
-
-          <div className="space-y-4">
-            {certificationStats.map((cert, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <CardTitle>{cert.name}</CardTitle>
-                  <CardDescription>
-                    {cert.questions} questions • {cert.users} users • {cert.passRate}% pass rate
-                  </CardDescription>
-                </CardHeader>
-                <CardFooter className="flex justify-end gap-2">
-                  <Link href={`/admin/certifications/${index}/questions`}>
-                    <Button variant="outline">Manage Questions</Button>
-                  </Link>
-                  <Link href={`/admin/certifications/${index}/edit`}>
-                    <Button>Edit Certification</Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="users" className="space-y-6">
-          <div className="flex justify-between">
-            <h2 className="text-xl font-bold">Manage Users</h2>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add User
-            </Button>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>User List</CardTitle>
-              <CardDescription>Manage user accounts and permissions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        View
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                View All Users
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="alerts" className="space-y-6">
-          <div className="flex justify-between">
-            <h2 className="text-xl font-bold">System Alerts</h2>
-            <Button variant="outline">
-              <Settings className="mr-2 h-4 w-4" />
-              Alert Settings
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            {alertItems.map((alert) => (
-              <Card
-                key={alert.id}
-                className={`border-l-4 ${
-                  alert.type === "warning"
-                    ? "border-l-amber-500"
-                    : alert.type === "success"
-                      ? "border-l-green-500"
-                      : "border-l-blue-500"
-                }`}
-              >
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    {alert.type === "warning" ? (
-                      <AlertTriangle className="h-5 w-5 text-amber-500" />
-                    ) : alert.type === "success" ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <BookOpenCheck className="h-5 w-5 text-blue-500" />
-                    )}
-                    {alert.message}
-                  </CardTitle>
-                  <CardDescription>{alert.details}</CardDescription>
-                </CardHeader>
-                <CardFooter className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">{new Date(alert.date).toLocaleDateString()}</span>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      Dismiss
-                    </Button>
-                    <Button size="sm">Take Action</Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   )
 }

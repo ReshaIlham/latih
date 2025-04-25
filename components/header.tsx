@@ -137,9 +137,11 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === item.href || pathname.startsWith(item.href + "/")
+                  pathname === item.href
                     ? "bg-primary/10 text-primary"
-                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                    : pathname.startsWith(item.href + "/") && item.href !== "/admin"
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground/70 hover:text-foreground hover:bg-accent"
                 }`}
               >
                 {item.name}
@@ -174,9 +176,9 @@ export default function Header() {
                       </div>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link href="/profile" className="flex cursor-pointer items-center">
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Profile</span>
+                        <Link href="/account-settings" className="flex cursor-pointer items-center">
+                          <Settings className="mr-2 h-4 w-4" />
+                          <span>Account Settings</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -221,9 +223,11 @@ export default function Header() {
                               key={item.href}
                               href={item.href}
                               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                pathname === item.href || pathname.startsWith(item.href + "/")
+                                pathname === item.href
                                   ? "bg-primary/10 text-primary"
-                                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                                  : pathname.startsWith(item.href + "/") && item.href !== "/admin"
+                                    ? "bg-primary/10 text-primary"
+                                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
                               }`}
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
@@ -234,10 +238,10 @@ export default function Header() {
                         </nav>
 
                         <div className="border-t pt-4 space-y-2">
-                          <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Link href="/account-settings" onClick={() => setIsMobileMenuOpen(false)}>
                             <Button variant="outline" className="w-full flex items-center justify-start">
-                              <User className="mr-2 h-4 w-4" />
-                              Profile
+                              <Settings className="mr-2 h-4 w-4" />
+                              Account Settings
                             </Button>
                           </Link>
                           <Button
@@ -295,9 +299,11 @@ export default function Header() {
                               key={item.href}
                               href={item.href}
                               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                pathname === item.href || pathname.startsWith(item.href + "/")
+                                pathname === item.href
                                   ? "bg-primary/10 text-primary"
-                                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                                  : pathname.startsWith(item.href + "/") && item.href !== "/admin"
+                                    ? "bg-primary/10 text-primary"
+                                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
                               }`}
                               onClick={() => setIsMobileMenuOpen(false)}
                             >

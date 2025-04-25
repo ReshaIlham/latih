@@ -68,9 +68,9 @@ export default function CertificationsPage() {
   return (
     <motion.div className="container py-10 md:py-16" initial="hidden" animate="visible" variants={containerVariants}>
       <motion.div className="mb-8 text-center" variants={itemVariants}>
-        <h1 className="text-4xl font-bold mb-3">Professional Scrum Certifications</h1>
+        <h1 className="text-4xl font-bold mb-3">Professional Certification Exam Simulator</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Prepare for your Scrum.org certification exams with our comprehensive practice tests and study materials
+          Prepare for your certification exams with our comprehensive exam simulator and test explanation
         </p>
       </motion.div>
 

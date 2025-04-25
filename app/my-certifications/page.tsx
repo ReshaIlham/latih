@@ -16,6 +16,7 @@ const recentTests = [
   {
     id: "test-1",
     certification: "Professional Scrum Master",
+    certificationId: "psm",
     date: "2023-10-15",
     score: 85,
     type: "medium",
@@ -24,6 +25,7 @@ const recentTests = [
   {
     id: "test-2",
     certification: "Professional Scrum Product Owner",
+    certificationId: "pspo",
     date: "2023-10-10",
     score: 92,
     type: "short",
@@ -32,6 +34,7 @@ const recentTests = [
   {
     id: "test-3",
     certification: "Project Management Professional",
+    certificationId: "pmp",
     date: "2023-10-18",
     progress: 65, // Progress percentage
     type: "full",
@@ -62,6 +65,14 @@ const recommendedCertifications = [
     testTypeCount: 3,
   },
 ]
+
+// Mock user stats
+const userStats = {
+  testsCompleted: 12,
+  totalTests: 15,
+  averageScore: 78,
+  studyTime: "8.5 hours",
+}
 
 // Animation variants
 const containerVariants = {
@@ -154,7 +165,9 @@ export default function MyCertificationsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
+              <div className="text-2xl font-bold">
+                {userStats.testsCompleted}/{userStats.totalTests}
+              </div>
               <p className="text-xs text-muted-foreground flex items-center">
                 <TrendingUp className="mr-1 h-3 w-3 text-green-500" />
                 +2 from last week
@@ -171,7 +184,7 @@ export default function MyCertificationsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">78%</div>
+              <div className="text-2xl font-bold">{userStats.averageScore}%</div>
               <p className="text-xs text-muted-foreground flex items-center">
                 <TrendingUp className="mr-1 h-3 w-3 text-green-500" />
                 +5% from last week
@@ -188,7 +201,7 @@ export default function MyCertificationsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">8.5 hours</div>
+              <div className="text-2xl font-bold">{userStats.studyTime}</div>
               <p className="text-xs text-muted-foreground">This week</p>
             </CardContent>
           </Card>
@@ -251,7 +264,9 @@ export default function MyCertificationsPage() {
                         </>
                       ) : (
                         <>
-                          <Link href={`/test?id=${test.id}&continue=true`}>
+                          <Link
+                            href={`/take-test?certification=${test.certificationId}&type=${test.type}&testId=${test.id}&continue=true`}
+                          >
                             <Button size="sm" className="gap-1">
                               <Play className="h-3 w-3" />
                               Continue
@@ -265,7 +280,7 @@ export default function MyCertificationsPage() {
               </div>
             </CardContent>
             <CardFooter className="mt-auto">
-              <Link href="/test-history" className="w-full">
+              <Link href={`/test-history/${user.id}`} className="w-full">
                 <Button variant="outline" className="w-full">
                   View All Tests
                 </Button>

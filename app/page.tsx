@@ -64,7 +64,7 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Popular Certifications</h2>
             <p className="max-w-[700px] text-muted-foreground">
-              Join thousands of professionals preparing for their Scrum certification exams
+              Join thousands of professionals preparing for their certification exams
             </p>
           </div>
 

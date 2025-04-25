@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,23 +26,70 @@ type TestType = {
   passingGrade: number
 }
 
-export default function NewCertificationPage() {
+type Certification = {
+  id: string
+  name: string
+  description: string
+  image: string
+  questionCount: number
+  userCount: number
+  passRate: number
+  status: CertificationStatus
+  lastUpdated: string
+  domains: Domain[]
+  testTypes: TestType[]
+}
+
+// Mock certifications data for demo
+const mockCertifications = {
+  psm: {
+    id: "psm",
+    name: "Professional Scrum Master (PSM)",
+    description: "Learn the role and responsibilities of a Scrum Master in agile development",
+    image: "/placeholder.svg?height=200&width=360&text=Professional+Scrum+Master",
+    questionCount: 120,
+    userCount: 450,
+    passRate: 68,
+    status: "active" as CertificationStatus,
+    lastUpdated: "2023-10-15T14:30:45",
+    domains: [
+      { id: "d1", name: "Roles" },
+      { id: "d2", name: "Artifacts" },
+      { id: "d3", name: "Events" },
+    ],
+    testTypes: [
+      { id: "t1", name: "Short Test", timeLimit: 30, questionCount: 40, passingGrade: 70 },
+      { id: "t2", name: "Medium Test", timeLimit: 60, questionCount: 80, passingGrade: 75 },
+      { id: "t3", name: "Full Test", timeLimit: 120, questionCount: 120, passingGrade: 80 },
+    ],
+  },
+  pspo: {
+    id: "pspo",
+    name: "Professional Scrum Product Owner (PSPO)",
+    description: "Master the skills needed to be an effective Product Owner in Scrum",
+    image: "/placeholder.svg?height=200&width=360&text=Professional+Scrum+Product+Owner",
+    questionCount: 95,
+    userCount: 320,
+    passRate: 72,
+    status: "active" as CertificationStatus,
+    lastUpdated: "2023-09-22T09:15:22",
+    domains: [
+      { id: "d4", name: "Roles" },
+      { id: "d5", name: "Artifacts" },
+      { id: "d6", name: "Events" },
+    ],
+    testTypes: [
+      { id: "t4", name: "Short Test", timeLimit: 30, questionCount: 30, passingGrade: 70 },
+      { id: "t5", name: "Medium Test", timeLimit: 60, questionCount: 60, passingGrade: 75 },
+      { id: "t6", name: "Full Test", timeLimit: 90, questionCount: 90, passingGrade: 80 },
+    ],
+  },
+}
+
+export default function EditCertificationPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(false)
-  const [newCertification, setNewCertification] = useState<{
-    name: string
-    description: string
-    image: string
-    status: CertificationStatus
-    domains: Domain[]
-    testTypes: TestType[]
-  }>({
-    name: "",
-    description: "",
-    image: "/placeholder.svg?height=200&width=360&text=New+Certification",
-    status: "not-active",
-    domains: [],
-    testTypes: [],
-  })
+  const [isLoadingData, setIsLoadingData] = useState(true)
+  const [certification, setCertification] = useState<Certification | null>(null)
   const [newDomain, setNewDomain] = useState<string>("")
   const [newTestType, setNewTestType] = useState<Omit<TestType, "id">>({
     name: "",
@@ -55,24 +102,56 @@ export default function NewCertificationPage() {
   const { toast } = useToast()
   const router = useRouter()
 
-  const handleAddCertification = async () => {
-    if (!isAdmin) {
-      toast({
-        title: "Unauthorized",
-        description: "You don't have permission to create certifications.",
-        variant: "destructive",
-      })
-      return
+  // Fetch certification data
+  useEffect(() => {
+    // Simulate API call
+    const fetchData = async () => {
+      setIsLoadingData(true)
+      try {
+        // In a real app, this would be an API call
+        await new Promise((resolve) => setTimeout(resolve, 500))
+
+        // Get certification from mock data
+        const cert = mockCertifications[params.id as keyof typeof mockCertifications]
+
+        if (cert) {
+          setCertification(cert)
+        } else {
+          toast({
+            title: "Certification not found",
+            description: "The certification you're trying to edit doesn't exist.",
+            variant: "destructive",
+          })
+          router.push("/admin/certifications")
+        }
+      } catch (error) {
+        toast({
+          title: "Failed to load certification",
+          description: "There was a problem loading the certification data.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoadingData(false)
+      }
     }
 
-    if (!newCertification.name || newCertification.domains.length === 0 || newCertification.testTypes.length === 0) {
+    fetchData()
+  }, [params.id, router, toast])
+
+  // Verify admin access
+  useEffect(() => {
+    if (!isAdmin) {
+      router.push("/login")
       toast({
-        title: "Incomplete information",
-        description: "Please fill in all required fields and add at least one domain and test type.",
+        title: "Unauthorized",
+        description: "You must be an admin to access this page.",
         variant: "destructive",
       })
-      return
     }
+  }, [isAdmin, router, toast])
+
+  const handleUpdateCertification = async () => {
+    if (!certification) return
 
     setIsLoading(true)
 
@@ -81,14 +160,14 @@ export default function NewCertificationPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       toast({
-        title: "Certification created",
-        description: `${newCertification.name} certification has been created successfully.`,
+        title: "Certification updated",
+        description: `${certification.name} has been updated successfully.`,
       })
       router.push("/admin/certifications")
     } catch (error) {
       toast({
-        title: "Failed to create certification",
-        description: "There was a problem creating the certification.",
+        title: "Failed to update certification",
+        description: "There was a problem updating the certification.",
         variant: "destructive",
       })
     } finally {
@@ -97,6 +176,8 @@ export default function NewCertificationPage() {
   }
 
   const handleAddDomain = () => {
+    if (!certification) return
+
     if (!newDomain) {
       toast({
         title: "Invalid domain",
@@ -106,10 +187,10 @@ export default function NewCertificationPage() {
       return
     }
 
-    setNewCertification({
-      ...newCertification,
+    setCertification({
+      ...certification,
       domains: [
-        ...newCertification.domains,
+        ...certification.domains,
         {
           id: `domain-${Date.now()}`,
           name: newDomain,
@@ -121,13 +202,17 @@ export default function NewCertificationPage() {
   }
 
   const handleRemoveDomain = (domainId: string) => {
-    setNewCertification({
-      ...newCertification,
-      domains: newCertification.domains.filter((domain) => domain.id !== domainId),
+    if (!certification) return
+
+    setCertification({
+      ...certification,
+      domains: certification.domains.filter((domain) => domain.id !== domainId),
     })
   }
 
   const handleAddTestType = () => {
+    if (!certification) return
+
     if (
       !newTestType.name ||
       newTestType.questionCount <= 0 ||
@@ -151,10 +236,10 @@ export default function NewCertificationPage() {
       return
     }
 
-    setNewCertification({
-      ...newCertification,
+    setCertification({
+      ...certification,
       testTypes: [
-        ...newCertification.testTypes,
+        ...certification.testTypes,
         {
           id: `test-${Date.now()}`,
           name: newTestType.name,
@@ -174,17 +259,45 @@ export default function NewCertificationPage() {
   }
 
   const handleRemoveTestType = (testTypeId: string) => {
-    setNewCertification({
-      ...newCertification,
-      testTypes: newCertification.testTypes.filter((test) => test.id !== testTypeId),
+    if (!certification) return
+
+    setCertification({
+      ...certification,
+      testTypes: certification.testTypes.filter((test) => test.id !== testTypeId),
     })
+  }
+
+  if (isLoadingData) {
+    return (
+      <div className="container py-10">
+        <div className="mb-8">
+          <BackButton href="/admin/certifications" />
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Loading certification data...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!certification) {
+    return (
+      <div className="container py-10">
+        <div className="mb-8">
+          <BackButton href="/admin/certifications" />
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-muted-foreground">Certification not found</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="container py-10">
       <div className="mb-8">
         <BackButton href="/admin/certifications" />
-        <h1 className="mt-6 text-3xl font-bold">Add New Certification</h1>
+        <h1 className="mt-6 text-3xl font-bold">Edit Certification</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -201,8 +314,8 @@ export default function NewCertificationPage() {
                 </label>
                 <Input
                   id="name"
-                  value={newCertification.name}
-                  onChange={(e) => setNewCertification({ ...newCertification, name: e.target.value })}
+                  value={certification.name}
+                  onChange={(e) => setCertification({ ...certification, name: e.target.value })}
                   placeholder="e.g., Professional Scrum Master"
                 />
               </div>
@@ -212,8 +325,8 @@ export default function NewCertificationPage() {
                 </label>
                 <Textarea
                   id="description"
-                  value={newCertification.description}
-                  onChange={(e) => setNewCertification({ ...newCertification, description: e.target.value })}
+                  value={certification.description}
+                  onChange={(e) => setCertification({ ...certification, description: e.target.value })}
                   placeholder="Brief description of the certification"
                   rows={3}
                 />
@@ -223,10 +336,8 @@ export default function NewCertificationPage() {
                   Status
                 </label>
                 <Select
-                  value={newCertification.status}
-                  onValueChange={(value: CertificationStatus) =>
-                    setNewCertification({ ...newCertification, status: value })
-                  }
+                  value={certification.status}
+                  onValueChange={(value: CertificationStatus) => setCertification({ ...certification, status: value })}
                 >
                   <SelectTrigger id="status">
                     <SelectValue placeholder="Select status" />
@@ -260,11 +371,11 @@ export default function NewCertificationPage() {
               <div className="rounded-md border">
                 <div className="p-4">
                   <h3 className="font-medium">Domains</h3>
-                  {newCertification.domains.length === 0 ? (
+                  {certification.domains.length === 0 ? (
                     <p className="text-sm text-muted-foreground mt-2">No domains added yet.</p>
                   ) : (
                     <div className="mt-2 space-y-2">
-                      {newCertification.domains.map((domain) => (
+                      {certification.domains.map((domain) => (
                         <div key={domain.id} className="flex items-center justify-between rounded-md border p-2">
                           <p className="font-medium">{domain.name}</p>
                           <Button
@@ -343,11 +454,11 @@ export default function NewCertificationPage() {
               <div className="rounded-md border">
                 <div className="p-4">
                   <h3 className="font-medium">Test Types</h3>
-                  {newCertification.testTypes.length === 0 ? (
+                  {certification.testTypes.length === 0 ? (
                     <p className="text-sm text-muted-foreground mt-2">No test types added yet.</p>
                   ) : (
                     <div className="mt-2 space-y-2">
-                      {newCertification.testTypes.map((test) => (
+                      {certification.testTypes.map((test) => (
                         <div key={test.id} className="flex items-center justify-between rounded-md border p-2">
                           <div>
                             <p className="font-medium">{test.name}</p>
@@ -382,21 +493,19 @@ export default function NewCertificationPage() {
             <CardContent className="space-y-4">
               <div>
                 <h3 className="text-sm font-medium">Certification Details</h3>
+                <p className="text-sm text-muted-foreground mt-1">{certification.name}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {newCertification.name ? newCertification.name : "No name provided"}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Status: {newCertification.status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  Status: {certification.status.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                 </p>
               </div>
 
               <div>
                 <h3 className="text-sm font-medium">Domains</h3>
-                {newCertification.domains.length === 0 ? (
+                {certification.domains.length === 0 ? (
                   <p className="text-sm text-muted-foreground mt-1">No domains added</p>
                 ) : (
                   <ul className="text-sm text-muted-foreground mt-1 list-disc list-inside">
-                    {newCertification.domains.map((domain) => (
+                    {certification.domains.map((domain) => (
                       <li key={domain.id}>{domain.name}</li>
                     ))}
                   </ul>
@@ -405,11 +514,11 @@ export default function NewCertificationPage() {
 
               <div>
                 <h3 className="text-sm font-medium">Test Types</h3>
-                {newCertification.testTypes.length === 0 ? (
+                {certification.testTypes.length === 0 ? (
                   <p className="text-sm text-muted-foreground mt-1">No test types added</p>
                 ) : (
                   <ul className="text-sm text-muted-foreground mt-1 list-disc list-inside">
-                    {newCertification.testTypes.map((test) => (
+                    {certification.testTypes.map((test) => (
                       <li key={test.id}>
                         {test.name} ({test.questionCount} questions, {test.timeLimit} min, {test.passingGrade}% to pass)
                       </li>
@@ -417,19 +526,29 @@ export default function NewCertificationPage() {
                   </ul>
                 )}
               </div>
+
+              <div>
+                <h3 className="text-sm font-medium">Statistics</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {certification.userCount} Users | {certification.passRate}% Pass Rate
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Last Updated: {new Date(certification.lastUpdated).toLocaleDateString()}
+                </p>
+              </div>
             </CardContent>
             <CardFooter>
               <Button
                 className="w-full"
-                onClick={handleAddCertification}
+                onClick={handleUpdateCertification}
                 disabled={
                   isLoading ||
-                  !newCertification.name ||
-                  newCertification.domains.length === 0 ||
-                  newCertification.testTypes.length === 0
+                  !certification.name ||
+                  certification.domains.length === 0 ||
+                  certification.testTypes.length === 0
                 }
               >
-                {isLoading ? "Creating..." : "Create Certification"}
+                {isLoading ? "Updating..." : "Update Certification"}
               </Button>
             </CardFooter>
           </Card>

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/auth-provider"
 import { useSubscription } from "@/lib/subscription-provider"
-import { Clock, FileQuestion, BookOpen, ArrowLeft, LayoutGrid, ListChecks } from "lucide-react"
+import { Clock, FileQuestion, BookOpen, ArrowLeft, LayoutGrid, ListChecks, BarChart3 } from "lucide-react"
 import type { TestType } from "@/lib/types"
 
 // Mock certification data
@@ -70,6 +70,45 @@ const certificationData = {
   },
 }
 
+// Mock user progress data
+const mockUserProgress = {
+  psm: {
+    testsCompleted: {
+      short: 2,
+      medium: 1,
+      full: 0,
+    },
+    domainScores: {
+      role: 78,
+      artifact: 65,
+      event: 82,
+    },
+    overallScore: 72,
+  },
+  pspo: {
+    testsCompleted: {
+      short: 1,
+      medium: 0,
+      full: 0,
+    },
+    domainScores: {
+      role: 70,
+      artifact: 60,
+      event: 75,
+    },
+    overallScore: 68,
+  },
+  pmp: {
+    testsCompleted: {
+      short: 0,
+      medium: 0,
+      full: 0,
+    },
+    domainScores: {},
+    overallScore: 0,
+  },
+}
+
 export default function CertificationDetailPage({ params }: { params: { id: string } }) {
   const [selectedTestType, setSelectedTestType] = useState<TestType>("short")
   const [selectedDomains, setSelectedDomains] = useState<string[]>([])
@@ -80,6 +119,7 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
 
   // Get certification data based on ID
   const certification = certificationData[params.id as keyof typeof certificationData]
+  const userProgress = mockUserProgress[params.id as keyof typeof mockUserProgress]
 
   if (!certification) {
     return (
@@ -136,7 +176,13 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
     }
 
     // Navigate to the test page
-    router.push(`/test?certification=${params.id}&type=${selectedTestType}&domains=${selectedDomains.join(",")}`)
+    router.push(`/take-test?certification=${params.id}&type=${selectedTestType}&domains=${selectedDomains.join(",")}`)
+  }
+
+  // Calculate total tests completed
+  const getTotalTestsCompleted = () => {
+    if (!userProgress) return 0
+    return Object.values(userProgress.testsCompleted).reduce((sum, count) => sum + count, 0)
   }
 
   return (
@@ -276,16 +322,58 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
               {user ? (
                 <>
                   <div>
-                    <p className="font-medium">Tests Completed</p>
-                    <p className="text-2xl font-bold">3</p>
+                    <p className="font-medium mb-2">Tests Completed</p>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      {certification.testTypes.map((type) => (
+                        <div key={type.id} className="flex justify-between">
+                          <span>{type.name}:</span>
+                          <span className="font-medium">{userProgress?.testsCompleted[type.id] || 0}</span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between col-span-2 border-t pt-1 mt-1">
+                        <span>Total:</span>
+                        <span className="font-bold">{getTotalTestsCompleted()}</span>
+                      </div>
+                    </div>
                   </div>
+
                   <div>
-                    <p className="font-medium">Average Score</p>
-                    <p className="text-2xl font-bold">72%</p>
+                    <p className="font-medium mb-2">Domain Performance</p>
+                    {Object.entries(userProgress?.domainScores || {}).length > 0 ? (
+                      <div className="space-y-2">
+                        {Object.entries(userProgress.domainScores).map(([domain, score]) => {
+                          const domainName = certification.domains.find((d) => d.id === domain)?.name || domain
+                          return (
+                            <div key={domain} className="space-y-1">
+                              <div className="flex justify-between text-sm">
+                                <span className="capitalize">{domainName}:</span>
+                                <span className={score >= 70 ? "text-green-600" : "text-amber-600"}>{score}%</span>
+                              </div>
+                              <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                <div
+                                  className={score >= 70 ? "bg-green-500 h-1.5" : "bg-amber-500 h-1.5"}
+                                  style={{ width: `${score}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                        <div className="pt-1 border-t mt-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="font-medium">Overall:</span>
+                            <span className="font-bold">{userProgress.overallScore}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Complete a test to see domain performance</p>
+                    )}
                   </div>
+
                   <div className="pt-2">
-                    <Link href={`/analytics?certification=${params.id}`}>
-                      <Button variant="outline" className="w-full">
+                    <Link href="/my-certifications">
+                      <Button variant="outline" className="w-full flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4" />
                         View Detailed Analytics
                       </Button>
                     </Link>
