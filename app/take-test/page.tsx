@@ -311,7 +311,7 @@ export default function TakeTestPage() {
     return questions.filter((q) => flaggedQuestions.has(q.id)).map((_, index) => index + 1)
   }
 
-  // Update the handleSubmitTest function to show confirmation dialog
+  // Update the handleSubmitConfirmation function to show confirmation dialog
   const handleSubmitConfirmation = () => {
     setShowSubmitConfirmation(true)
   }
@@ -376,22 +376,46 @@ export default function TakeTestPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-5 gap-2">
-                  {questions.map((question, index) => (
-                    <Button
-                      key={question.id}
-                      variant={
-                        currentQuestionIndex === index ? "default" : selectedAnswers[question.id] ? "outline" : "ghost"
-                      }
-                      size="sm"
-                      className={cn(
-                        "h-8 w-8 p-0 font-medium",
-                        flaggedQuestions.has(question.id) && "border-2 border-yellow-400",
-                      )}
-                      onClick={() => handleJumpToQuestion(index)}
-                    >
-                      {index + 1}
-                    </Button>
-                  ))}
+                  {questions.map((question, index) => {
+                    // Determine the button variant and styling based on question state
+                    let buttonVariant: "default" | "outline" | "ghost" | "secondary" = "ghost"
+                    let extraClasses = ""
+
+                    // Current question
+                    if (currentQuestionIndex === index) {
+                      buttonVariant = "default"
+                    }
+                    // Answered question
+                    else if (selectedAnswers[question.id]) {
+                      buttonVariant = "secondary"
+                      extraClasses = "bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
+                    }
+                    // Unanswered question
+                    else {
+                      buttonVariant = "outline"
+                      extraClasses = "bg-gray-50"
+                    }
+
+                    // Flagged question - add a flag indicator
+                    if (flaggedQuestions.has(question.id)) {
+                      extraClasses += " relative"
+                    }
+
+                    return (
+                      <Button
+                        key={question.id}
+                        variant={buttonVariant}
+                        size="sm"
+                        className={cn("h-8 w-8 p-0 font-medium", extraClasses)}
+                        onClick={() => handleJumpToQuestion(index)}
+                      >
+                        {index + 1}
+                        {flaggedQuestions.has(question.id) && (
+                          <div className="absolute -top-1 -right-1 h-3 w-3 bg-yellow-400 rounded-full"></div>
+                        )}
+                      </Button>
+                    )
+                  })}
                 </div>
 
                 <div className="mt-4 space-y-2">
@@ -400,15 +424,17 @@ export default function TakeTestPage() {
                     <span>Current</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="h-3 w-3 rounded-full border border-input bg-background"></div>
+                    <div className="h-3 w-3 rounded-full border border-input bg-gray-50"></div>
                     <span>Not answered</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="h-3 w-3 rounded-full bg-muted"></div>
+                    <div className="h-3 w-3 rounded-full bg-green-100"></div>
                     <span>Answered</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
-                    <div className="h-3 w-3 rounded-full border-2 border-yellow-400"></div>
+                    <div className="relative h-3 w-3 rounded-full border border-input bg-gray-50">
+                      <div className="absolute -top-1 -right-1 h-2 w-2 bg-yellow-400 rounded-full"></div>
+                    </div>
                     <span>Flagged for review</span>
                   </div>
                 </div>
@@ -427,7 +453,7 @@ export default function TakeTestPage() {
                     size="sm"
                     className={cn(
                       "gap-1",
-                      flaggedQuestions.has(currentQuestion.id) && "text-yellow-600 border-yellow-400",
+                      flaggedQuestions.has(currentQuestion.id) && "text-yellow-600 border-yellow-400 bg-yellow-50",
                     )}
                     onClick={() => handleFlagQuestion(currentQuestion.id)}
                   >

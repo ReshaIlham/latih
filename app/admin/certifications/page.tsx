@@ -32,7 +32,6 @@ import {
   PlusCircle,
   Edit,
   Trash2,
-  BarChart3,
   FileQuestion,
   X,
   MoreHorizontal,
@@ -56,13 +55,13 @@ type TestType = {
   passingGrade: number
 }
 
-// Mock certifications data
+// Update the mockCertifications array with Unsplash images
 const mockCertifications = [
   {
     id: "psm",
     name: "Professional Scrum Master (PSM)",
     description: "Learn the role and responsibilities of a Scrum Master in agile development",
-    image: "/placeholder.svg?height=200&width=360&text=Professional+Scrum+Master",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop",
     questionCount: 120,
     userCount: 450,
     passRate: 68,
@@ -83,7 +82,7 @@ const mockCertifications = [
     id: "pspo",
     name: "Professional Scrum Product Owner (PSPO)",
     description: "Master the skills needed to be an effective Product Owner in Scrum",
-    image: "/placeholder.svg?height=200&width=360&text=Professional+Scrum+Product+Owner",
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2940&auto=format&fit=crop",
     questionCount: 95,
     userCount: 320,
     passRate: 72,
@@ -101,31 +100,10 @@ const mockCertifications = [
     ],
   },
   {
-    id: "psd",
-    name: "Professional Scrum Developer (PSD)",
-    description: "Develop software using Scrum with modern engineering practices",
-    image: "/placeholder.svg?height=200&width=360&text=Professional+Scrum+Developer",
-    questionCount: 85,
-    userCount: 210,
-    passRate: 65,
-    status: "not-active" as CertificationStatus,
-    lastUpdated: "2023-08-10T11:45:30",
-    domains: [
-      { id: "d7", name: "Roles" },
-      { id: "d8", name: "Artifacts" },
-      { id: "d9", name: "Events" },
-    ],
-    testTypes: [
-      { id: "t7", name: "Short Test", timeLimit: 25, questionCount: 25, passingGrade: 70 },
-      { id: "t8", name: "Medium Test", timeLimit: 50, questionCount: 50, passingGrade: 75 },
-      { id: "t9", name: "Full Test", timeLimit: 85, questionCount: 85, passingGrade: 80 },
-    ],
-  },
-  {
     id: "pmp",
     name: "Project Management Professional (PMP)",
     description: "Prepare for the globally recognized project management certification from PMI",
-    image: "/placeholder.svg?height=200&width=360&text=Project+Management+Professional",
+    image: "https://images.unsplash.com/photo-1542626991-cbc4e32524cc?q=80&w=2940&auto=format&fit=crop",
     questionCount: 200,
     userCount: 180,
     passRate: 70,
@@ -142,28 +120,6 @@ const mockCertifications = [
       { id: "t10", name: "Short Test", timeLimit: 45, questionCount: 50, passingGrade: 70 },
       { id: "t11", name: "Medium Test", timeLimit: 90, questionCount: 100, passingGrade: 75 },
       { id: "t12", name: "Full Test", timeLimit: 180, questionCount: 200, passingGrade: 80 },
-    ],
-  },
-  {
-    id: "safe",
-    name: "SAFe Agilist (SA)",
-    description: "Learn how to lead a Lean-Agile enterprise using the Scaled Agile Framework",
-    image: "/placeholder.svg?height=200&width=360&text=SAFe+Agilist",
-    questionCount: 150,
-    userCount: 120,
-    passRate: 75,
-    status: "coming-soon" as CertificationStatus,
-    lastUpdated: "2023-06-17T08:55:42",
-    domains: [
-      { id: "d15", name: "Lean-Agile Principles" },
-      { id: "d16", name: "SAFe Principles" },
-      { id: "d17", name: "Agile Release Train" },
-      { id: "d18", name: "Program Increment" },
-    ],
-    testTypes: [
-      { id: "t13", name: "Short Test", timeLimit: 40, questionCount: 45, passingGrade: 70 },
-      { id: "t14", name: "Medium Test", timeLimit: 75, questionCount: 90, passingGrade: 75 },
-      { id: "t15", name: "Full Test", timeLimit: 150, questionCount: 150, passingGrade: 80 },
     ],
   },
 ]
@@ -347,12 +303,6 @@ export default function CertificationsManagementPage() {
                       <Link href={`/admin/certifications/${certification.id}/questions`} className="cursor-pointer">
                         <FileQuestion className="mr-2 h-4 w-4" />
                         Questions
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/admin/certifications/${certification.id}`} className="cursor-pointer">
-                        <BarChart3 className="mr-2 h-4 w-4" />
-                        Analytics
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

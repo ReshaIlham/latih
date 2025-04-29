@@ -1,9 +1,14 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, Clock, BarChart3, CheckCircle, ListChecks, LayoutGrid } from "lucide-react"
+import { useAuth } from "@/lib/auth-provider"
 
 export default function Home() {
+  const { user } = useAuth()
+
   return (
     <div className="flex flex-col">
       {/* Hero Section with Design Pattern */}
@@ -30,9 +35,9 @@ export default function Home() {
                 </p>
               </div>
               <div className="animate-slide-up [animation-delay:400ms] flex flex-col gap-2 sm:flex-row">
-                <Link href="/signup" className="w-full sm:w-auto">
+                <Link href={user ? "/certifications" : "/signup"} className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto gap-1.5">
-                    Get Started
+                    {user ? "Browse Certifications" : "Get Started"}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -46,7 +51,7 @@ export default function Home() {
             <div className="flex items-center justify-center mt-8 lg:mt-0">
               <div className="animate-slide-up [animation-delay:600ms] relative w-full max-w-[500px] rounded-lg overflow-hidden shadow-xl">
                 <Image
-                  src="/placeholder.svg?height=300&width=500&text=Certification+Practice"
+                  src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2940&auto=format&fit=crop"
                   alt="Certification Practice"
                   width={500}
                   height={300}
@@ -73,7 +78,7 @@ export default function Home() {
             <div className="certification-card group bg-white rounded-xl border shadow-card overflow-hidden hover:shadow-medium transition-all duration-200 flex flex-col h-full">
               <Link href="/certifications/psm" className="block relative">
                 <Image
-                  src="/placeholder.svg?height=200&width=360&text=Professional+Scrum+Master"
+                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop"
                   alt="Professional Scrum Master"
                   width={360}
                   height={200}
@@ -117,7 +122,7 @@ export default function Home() {
             <div className="certification-card group bg-white rounded-xl border shadow-card overflow-hidden hover:shadow-medium transition-all duration-200 flex flex-col h-full">
               <Link href="/certifications/pspo" className="block relative">
                 <Image
-                  src="/placeholder.svg?height=200&width=360&text=Professional+Scrum+Product+Owner"
+                  src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2940&auto=format&fit=crop"
                   alt="Professional Scrum Product Owner"
                   width={360}
                   height={200}
@@ -248,9 +253,9 @@ export default function Home() {
                   <span>Basic progress tracking</span>
                 </li>
               </ul>
-              <Link href="/signup">
+              <Link href={user ? "/certifications" : "/signup"}>
                 <Button variant="outline" className="w-full">
-                  Get Started
+                  {user ? "Browse Certifications" : "Get Started"}
                 </Button>
               </Link>
             </div>
@@ -315,9 +320,9 @@ export default function Home() {
               </p>
             </div>
             <div className="w-full max-w-md space-y-2">
-              <Link href="/signup" className="w-full">
+              <Link href={user ? "/certifications" : "/signup"} className="w-full">
                 <Button size="lg" className="w-full">
-                  Get Started
+                  {user ? "Browse Certifications" : "Get Started"}
                 </Button>
               </Link>
               <p className="text-xs text-muted-foreground">No credit card required for free plan</p>
@@ -338,61 +343,6 @@ export default function Home() {
             <p className="text-sm text-muted-foreground mb-4">
               Practice for certification exams with customized tests tailored to your certification needs.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                </svg>
-                <span className="sr-only">Facebook</span>
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
-                </svg>
-                <span className="sr-only">Twitter</span>
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-                </svg>
-                <span className="sr-only">Instagram</span>
-              </a>
-            </div>
           </div>
           <div>
             <h3 className="text-sm font-medium mb-4">Main Menu</h3>
@@ -433,28 +383,33 @@ export default function Home() {
                 </Link>
               </li>
               <li>
-                <Link href="/profile" className="text-muted-foreground hover:text-foreground">
-                  Profile
+                <Link href="/account-settings" className="text-muted-foreground hover:text-foreground">
+                  Account Settings
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-medium mb-4">Legal</h3>
+            <h3 className="text-sm font-medium mb-4">Contact</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Terms of Service
+                <Link href="/contact" className="text-muted-foreground hover:text-foreground">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <a href="mailto:support@latih.com" className="text-muted-foreground hover:text-foreground">
+                  support@latih.com
                 </a>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  Cookie Policy
+                <a
+                  href="https://wa.me/6281905454606"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  WhatsApp Support
                 </a>
               </li>
             </ul>

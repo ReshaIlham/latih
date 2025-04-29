@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth-provider"
 import { useSubscription } from "@/lib/subscription-provider"
 import { CheckCircle, Sparkles } from "lucide-react"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 // Animation variants
 const containerVariants = {
@@ -47,22 +48,29 @@ export default function PricingPage() {
       return
     }
 
-    setIsLoading(tier)
-    try {
-      await subscribe(tier)
-      toast({
-        title: "Subscription updated",
-        description: `You are now subscribed to the ${tier} plan.`,
-      })
-      router.push("/dashboard")
-    } catch (error) {
-      toast({
-        title: "Subscription failed",
-        description: "There was a problem updating your subscription.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(null)
+    if (tier === "free") {
+      setIsLoading(tier)
+      try {
+        await subscribe(tier)
+        toast({
+          title: "Subscription updated",
+          description: `You are now subscribed to the ${tier} plan.`,
+        })
+        router.push("/dashboard")
+      } catch (error) {
+        toast({
+          title: "Subscription failed",
+          description: "There was a problem updating your subscription.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(null)
+      }
+    } else {
+      // For premium, redirect to WhatsApp
+      const message = `Hello Latih Team, I would like to upgrade my account to Premium. My email is: ${user.email}`
+      const whatsappURL = `https://wa.me/6281905454606?text=${encodeURIComponent(message)}`
+      window.open(whatsappURL, "_blank")
     }
   }
 
@@ -176,7 +184,7 @@ export default function PricingPage() {
                   ) : status.tier === "premium" ? (
                     "Current Plan"
                   ) : (
-                    "Subscribe"
+                    "Subscribe via WhatsApp"
                   )}
                 </Button>
               </CardFooter>
@@ -189,9 +197,9 @@ export default function PricingPage() {
             All plans include access to our platform, regular updates, and customer support.
             <br />
             Need help choosing?{" "}
-            <a href="#" className="text-primary hover:underline">
+            <Link href="/contact" className="text-primary hover:underline">
               Contact our team
-            </a>
+            </Link>
             .
           </p>
         </motion.div>

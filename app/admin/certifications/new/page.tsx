@@ -1,7 +1,10 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -9,7 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/auth-provider"
-import { Plus, Minus } from "lucide-react"
+import { Plus, Minus, Upload } from "lucide-react"
 import { BackButton } from "@/components/back-button"
 
 // Types
@@ -32,6 +35,7 @@ export default function NewCertificationPage() {
     name: string
     description: string
     image: string
+    coverImage: string | null
     status: CertificationStatus
     domains: Domain[]
     testTypes: TestType[]
@@ -39,6 +43,7 @@ export default function NewCertificationPage() {
     name: "",
     description: "",
     image: "/placeholder.svg?height=200&width=360&text=New+Certification",
+    coverImage: null,
     status: "not-active",
     domains: [],
     testTypes: [],
@@ -180,6 +185,24 @@ export default function NewCertificationPage() {
     })
   }
 
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0]
+      const reader = new FileReader()
+
+      reader.onload = (event) => {
+        if (event.target && typeof event.target.result === "string") {
+          setNewCertification({
+            ...newCertification,
+            coverImage: event.target.result,
+          })
+        }
+      }
+
+      reader.readAsDataURL(file)
+    }
+  }
+
   return (
     <div className="container py-10">
       <div className="mb-8">
@@ -237,6 +260,58 @@ export default function NewCertificationPage() {
                     <SelectItem value="coming-soon">Coming Soon</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="grid gap-2">
+                <label className="text-sm font-medium">Cover Image</label>
+                <div className="flex flex-col gap-4">
+                  <div className="border rounded-md p-4 flex flex-col items-center justify-center gap-4">
+                    {newCertification.coverImage ? (
+                      <div className="relative w-full h-48 rounded-md overflow-hidden">
+                        <Image
+                          src={newCertification.coverImage || "/placeholder.svg"}
+                          alt="Cover image preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-48 bg-muted rounded-md flex items-center justify-center">
+                        <p className="text-muted-foreground">No cover image selected</p>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="gap-2"
+                        onClick={() => document.getElementById("cover-image-upload")?.click()}
+                      >
+                        <Upload className="h-4 w-4" />
+                        {newCertification.coverImage ? "Change Cover Image" : "Upload Cover Image"}
+                      </Button>
+                      <input
+                        id="cover-image-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCoverImageChange}
+                        className="hidden"
+                      />
+                      {newCertification.coverImage && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => setNewCertification({ ...newCertification, coverImage: null })}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Recommended size: 1200 x 600 pixels. Max file size: 2MB.
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

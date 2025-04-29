@@ -13,8 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { User, LogOut, Settings, Menu, BookOpen, LayoutDashboard, Users, CreditCard } from "lucide-react"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { User, LogOut, Settings, Menu, BookOpen, LayoutDashboard, Users, CreditCard, Phone } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function Header() {
@@ -69,7 +69,7 @@ export default function Header() {
         },
       ]
     }
-    // Items for learner users - reordered as requested
+    // Items for learner users - reordered as requested and added mentoring session
     else if (user) {
       return [
         {
@@ -81,6 +81,85 @@ export default function Header() {
           name: "Browse Certifications",
           href: "/certifications",
           icon: BookOpen,
+        },
+        {
+          name: "Mentoring Sessions",
+          href: "/mentoring",
+          icon: Users,
+        },
+        {
+          name: "Pricing",
+          href: "/pricing",
+          icon: CreditCard,
+        },
+      ]
+    }
+    // For non-authenticated users
+    else {
+      return [
+        {
+          name: "Browse Certifications",
+          href: "/certifications",
+          icon: BookOpen,
+        },
+        {
+          name: "Pricing",
+          href: "/pricing",
+          icon: CreditCard,
+        },
+      ]
+    }
+  }
+
+  // Mobile menu items based on user role
+  const getMobileMenuItems = () => {
+    // Items for admin users
+    if (isAdmin) {
+      return [
+        {
+          name: "Admin Dashboard",
+          href: "/admin",
+          icon: Settings,
+        },
+        {
+          name: "User Management",
+          href: "/admin/users",
+          icon: Users,
+        },
+        {
+          name: "Certifications Management",
+          href: "/admin/certifications",
+          icon: BookOpen,
+        },
+        {
+          name: "My Certifications",
+          href: "/my-certifications",
+          icon: LayoutDashboard,
+        },
+        {
+          name: "Browse Certifications",
+          href: "/certifications",
+          icon: BookOpen,
+        },
+      ]
+    }
+    // Items for learner users
+    else if (user) {
+      return [
+        {
+          name: "My Certifications",
+          href: "/my-certifications",
+          icon: LayoutDashboard,
+        },
+        {
+          name: "Browse Certifications",
+          href: "/certifications",
+          icon: BookOpen,
+        },
+        {
+          name: "Mentoring Sessions",
+          href: "/mentoring",
+          icon: Users,
         },
         {
           name: "Pricing",
@@ -107,6 +186,7 @@ export default function Header() {
   }
 
   const navItems = getNavItems()
+  const mobileMenuItems = getMobileMenuItems()
 
   return (
     <header
@@ -181,6 +261,12 @@ export default function Header() {
                           <span>Account Settings</span>
                         </Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href="/contact" className="flex cursor-pointer items-center">
+                          <Phone className="mr-2 h-4 w-4" />
+                          <span>Contact</span>
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="cursor-pointer" onClick={() => signOut()}>
                         <LogOut className="mr-2 h-4 w-4" />
@@ -189,14 +275,14 @@ export default function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
 
-                  {/* Mobile Menu Button */}
+                  {/* Mobile Menu Button for authenticated users */}
+                  <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMobileMenuOpen(true)}>
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+
+                  {/* Mobile Menu Sheet */}
                   <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                    <SheetTrigger asChild>
-                      <Button variant="ghost" size="icon" className="md:hidden">
-                        <Menu className="h-5 w-5" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </SheetTrigger>
                     <SheetContent side="right" className="w-[80vw] sm:w-[350px]">
                       <div className="flex flex-col space-y-6 py-6">
                         <div className="flex items-center justify-between">
@@ -218,7 +304,7 @@ export default function Header() {
 
                         {/* Mobile Navigation */}
                         <nav className="flex flex-col space-y-1">
-                          {navItems.map((item) => (
+                          {mobileMenuItems.map((item) => (
                             <Link
                               key={item.href}
                               href={item.href}
@@ -242,6 +328,12 @@ export default function Header() {
                             <Button variant="outline" className="w-full flex items-center justify-start">
                               <Settings className="mr-2 h-4 w-4" />
                               Account Settings
+                            </Button>
+                          </Link>
+                          <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+                            <Button variant="outline" className="w-full flex items-center justify-start">
+                              <Phone className="mr-2 h-4 w-4" />
+                              Contact
                             </Button>
                           </Link>
                           <Button
@@ -274,13 +366,13 @@ export default function Header() {
                   </div>
 
                   {/* Mobile Menu Button for non-authenticated users */}
+                  <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMobileMenuOpen(true)}>
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+
+                  {/* Mobile Menu Sheet for non-authenticated users */}
                   <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                    <SheetTrigger asChild>
-                      <Button variant="ghost" size="icon" className="md:hidden">
-                        <Menu className="h-5 w-5" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </SheetTrigger>
                     <SheetContent side="right" className="w-[80vw] sm:w-[350px]">
                       <div className="flex flex-col space-y-6 py-6">
                         <div className="flex items-center justify-between">
@@ -292,9 +384,9 @@ export default function Header() {
                           </Link>
                         </div>
 
-                        {/* Mobile Navigation */}
+                        {/* Mobile Navigation for non-authenticated users */}
                         <nav className="flex flex-col space-y-1">
-                          {navItems.map((item) => (
+                          {mobileMenuItems.map((item) => (
                             <Link
                               key={item.href}
                               href={item.href}
@@ -313,15 +405,21 @@ export default function Header() {
                           ))}
                         </nav>
 
-                        <div className="border-t pt-4 space-y-2">
+                        <div className="border-t pt-4">
                           <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                            <Button variant="outline" className="w-full">
+                            <Button variant="outline" className="w-full flex items-center justify-start">
+                              <User className="mr-2 h-4 w-4" />
                               Log In
                             </Button>
                           </Link>
-                          <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                            <Button className="w-full">Sign Up</Button>
-                          </Link>
+                          <div className="mt-3">
+                            <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                              <Button className="w-full flex items-center justify-start">
+                                <User className="mr-2 h-4 w-4" />
+                                Sign Up
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </SheetContent>

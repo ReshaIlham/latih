@@ -190,6 +190,32 @@ const extendedMockQuestions = [...Array(30)].map((_, index) => {
 // Combine original and extended questions
 const allMockQuestions = [...mockQuestions, ...extendedMockQuestions]
 
+// Sample bulk upload template data
+const sampleTemplateData = [
+  {
+    question: "What is the primary responsibility of a Scrum Master?",
+    domain: "role",
+    "option a": "Managing the team and assigning tasks",
+    "option b": "Facilitating Scrum events and removing impediments",
+    "option c": "Writing user stories and managing the product backlog",
+    "option d": "Reporting team progress to stakeholders",
+    "correct answer": "b",
+    explanation:
+      "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
+  },
+  {
+    question: "Which of the following is NOT a Scrum artifact?",
+    domain: "artifact",
+    "option a": "Product Backlog",
+    "option b": "Sprint Backlog",
+    "option c": "Burndown Chart",
+    "option d": "Increment",
+    "correct answer": "c",
+    explanation:
+      "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
+  },
+]
+
 export default function ManageQuestionsPage({ params }: { params: { id: string } }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDomain, setSelectedDomain] = useState<TestDomain | "all">("all")
@@ -200,6 +226,8 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
   const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [questionsPerPage, setQuestionsPerPage] = useState(10)
+  const [bulkUploadPreview, setBulkUploadPreview] = useState<any[]>([])
+  const [showBulkPreview, setShowBulkPreview] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
@@ -280,10 +308,14 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setUploadFile(e.target.files[0])
+
+      // In a real app, we would parse the Excel file here
+      // For demo purposes, we'll use the sample data
+      setBulkUploadPreview(sampleTemplateData)
     }
   }
 
-  const handleBulkUpload = () => {
+  const handlePreviewBulkUpload = () => {
     if (!uploadFile) {
       toast({
         title: "No file selected",
@@ -293,22 +325,67 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
       return
     }
 
+    setShowBulkPreview(true)
+  }
+
+  const handleBulkUpload = () => {
     // In a real app, we would process the Excel file here
     toast({
-      title: "File Uploaded",
-      description: `${uploadFile.name} has been uploaded and processed successfully.`,
+      title: "Questions Uploaded",
+      description: `${bulkUploadPreview.length} questions have been uploaded successfully.`,
     })
 
     setUploadFile(null)
     setShowBulkUpload(false)
+    setShowBulkPreview(false)
+    setBulkUploadPreview([])
   }
 
   const handleDownloadTemplate = () => {
     // In a real app, we would generate and download an Excel template
+    // For demo purposes, we'll just show a toast
     toast({
       title: "Template Downloaded",
       description: "The Excel template has been downloaded.",
     })
+
+    // Create a sample CSV content
+    const csvContent = [
+      ["question", "domain", "option a", "option b", "option c", "option d", "correct answer", "explanation"],
+      [
+        "What is the primary responsibility of a Scrum Master?",
+        "role",
+        "Managing the team and assigning tasks",
+        "Facilitating Scrum events and removing impediments",
+        "Writing user stories and managing the product backlog",
+        "Reporting team progress to stakeholders",
+        "b",
+        "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
+      ],
+      [
+        "Which of the following is NOT a Scrum artifact?",
+        "artifact",
+        "Product Backlog",
+        "Sprint Backlog",
+        "Burndown Chart",
+        "Increment",
+        "c",
+        "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
+      ],
+    ]
+      .map((row) => row.join(","))
+      .join("\n")
+
+    // Create a Blob and download it
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", "question_template.csv")
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   return (
@@ -360,7 +437,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-medium">Bulk Upload Questions</h3>
-              <p className="text-sm text-muted-foreground">Upload questions in bulk using an Excel file</p>
+              <p className="text-sm text-muted-foreground">Upload questions in bulk using an Excel or CSV file</p>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" onClick={handleDownloadTemplate}>
@@ -368,15 +445,15 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                 Download Template
               </Button>
               <p className="text-sm text-muted-foreground">
-                Download the Excel template and fill it with your questions before uploading.
+                Download the template and fill it with your questions before uploading.
               </p>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="file-upload">Upload Excel File</Label>
+              <Label htmlFor="file-upload">Upload File</Label>
               <Input
                 id="file-upload"
                 type="file"
-                accept=".xlsx,.xls"
+                accept=".xlsx,.xls,.csv"
                 onChange={handleFileChange}
                 className="cursor-pointer"
               />
@@ -390,8 +467,8 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
               <Button variant="outline" onClick={() => setShowBulkUpload(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleBulkUpload} disabled={!uploadFile}>
-                Upload and Process
+              <Button onClick={handlePreviewBulkUpload} disabled={!uploadFile}>
+                Preview Questions
               </Button>
             </div>
           </div>
@@ -724,6 +801,63 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
               Cancel
             </Button>
             <Button onClick={handleUpdateQuestion}>Update Question</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Upload Preview Dialog */}
+      <Dialog open={showBulkPreview} onOpenChange={setShowBulkPreview}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Preview Questions</DialogTitle>
+            <DialogDescription>
+              Review the questions before uploading. {bulkUploadPreview.length} questions found in the file.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="rounded-md border overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Question</TableHead>
+                    <TableHead>Domain</TableHead>
+                    <TableHead>Options</TableHead>
+                    <TableHead>Correct Answer</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {bulkUploadPreview.map((item, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{item.question}</TableCell>
+                      <TableCell>{item.domain}</TableCell>
+                      <TableCell>
+                        <div className="space-y-1 text-sm">
+                          <p>
+                            <span className="font-semibold">A:</span> {item["option a"]}
+                          </p>
+                          <p>
+                            <span className="font-semibold">B:</span> {item["option b"]}
+                          </p>
+                          <p>
+                            <span className="font-semibold">C:</span> {item["option c"]}
+                          </p>
+                          <p>
+                            <span className="font-semibold">D:</span> {item["option d"]}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="uppercase font-medium">{item["correct answer"]}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBulkPreview(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleBulkUpload}>Upload {bulkUploadPreview.length} Questions</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

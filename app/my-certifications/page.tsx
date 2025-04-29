@@ -45,12 +45,13 @@ const recentTests = [
   },
 ]
 
+// Update the recommendedCertifications array with Unsplash images
 const recommendedCertifications = [
   {
     id: "psm",
     title: "Professional Scrum Master (PSM)",
     description: "Learn the role and responsibilities of a Scrum Master in agile development",
-    image: "/placeholder.svg?height=80&width=120&text=PSM",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop",
     questionCount: 120,
     domainCount: 3,
     testTypeCount: 3,
@@ -59,7 +60,7 @@ const recommendedCertifications = [
     id: "pspo",
     title: "Professional Scrum Product Owner (PSPO)",
     description: "Master the skills needed to be an effective Product Owner in Scrum",
-    image: "/placeholder.svg?height=80&width=120&text=PSPO",
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2940&auto=format&fit=crop",
     questionCount: 95,
     domainCount: 3,
     testTypeCount: 3,

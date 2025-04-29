@@ -41,7 +41,19 @@ import { useAuth } from "@/lib/auth-provider"
 import { Search, UserCog, Trash2, RefreshCw, Plus, X, ChevronLeft, ChevronRight, History } from "lucide-react"
 import Link from "next/link"
 
-// Mock users data
+// First, update the User type to include expiresAt
+type User = {
+  id: string
+  name: string
+  email: string
+  phone: string
+  role: "admin" | "learner"
+  plan: "free" | "premium"
+  lastUpdated: string
+  expiresAt?: string | null
+}
+
+// Update the mockUsers data to include expiresAt for premium users
 const mockUsers = [
   {
     id: "user-1",
@@ -51,6 +63,7 @@ const mockUsers = [
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-05-15T14:30:45",
+    expiresAt: "2024-05-15T14:30:45",
   },
   {
     id: "user-2",
@@ -60,6 +73,7 @@ const mockUsers = [
     role: "learner",
     plan: "free",
     lastUpdated: "2023-06-22T09:15:22",
+    expiresAt: null,
   },
   {
     id: "user-3",
@@ -69,6 +83,7 @@ const mockUsers = [
     role: "admin",
     plan: "premium",
     lastUpdated: "2023-01-10T11:45:30",
+    expiresAt: "2024-01-10T11:45:30",
   },
   {
     id: "user-4",
@@ -78,6 +93,7 @@ const mockUsers = [
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-07-05T16:20:10",
+    expiresAt: "2024-07-05T16:20:10",
   },
   {
     id: "user-5",
@@ -87,6 +103,7 @@ const mockUsers = [
     role: "learner",
     plan: "free",
     lastUpdated: "2023-08-17T08:55:42",
+    expiresAt: null,
   },
   {
     id: "user-6",
@@ -96,6 +113,7 @@ const mockUsers = [
     role: "admin",
     plan: "premium",
     lastUpdated: "2023-03-28T13:10:05",
+    expiresAt: "2024-03-28T13:10:05",
   },
   {
     id: "user-7",
@@ -105,6 +123,7 @@ const mockUsers = [
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-09-14T10:30:15",
+    expiresAt: "2024-09-14T10:30:15",
   },
   {
     id: "user-8",
@@ -114,6 +133,7 @@ const mockUsers = [
     role: "learner",
     plan: "free",
     lastUpdated: "2023-02-19T15:45:33",
+    expiresAt: null,
   },
   {
     id: "admin-1",
@@ -123,6 +143,7 @@ const mockUsers = [
     role: "admin",
     plan: "premium",
     lastUpdated: "2022-10-05T09:20:18",
+    expiresAt: "2023-10-05T09:20:18", // Expired
   },
   {
     id: "learner-1",
@@ -132,6 +153,7 @@ const mockUsers = [
     role: "learner",
     plan: "free",
     lastUpdated: "2023-04-12T14:25:50",
+    expiresAt: null,
   },
   {
     id: "user-9",
@@ -141,6 +163,7 @@ const mockUsers = [
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-10-01T11:22:33",
+    expiresAt: "2023-09-01T11:22:33", // Expired
   },
   {
     id: "user-10",
@@ -150,6 +173,7 @@ const mockUsers = [
     role: "learner",
     plan: "free",
     lastUpdated: "2023-10-05T16:42:10",
+    expiresAt: null,
   },
   {
     id: "user-11",
@@ -159,6 +183,7 @@ const mockUsers = [
     role: "learner",
     plan: "premium",
     lastUpdated: "2023-10-10T09:15:27",
+    expiresAt: "2024-10-10T09:15:27",
   },
   {
     id: "user-12",
@@ -168,17 +193,18 @@ const mockUsers = [
     role: "admin",
     plan: "premium",
     lastUpdated: "2023-10-15T14:30:45",
+    expiresAt: "2024-10-15T14:30:45",
   },
 ]
 
-type User = {
-  id: string
-  name: string
-  email: string
-  phone: string
-  role: "admin" | "learner"
-  plan: "free" | "premium"
-  lastUpdated: string
+// Update the newUser state to include expiresAt
+const initialNewUserState: Omit<User, "id" | "lastUpdated"> = {
+  name: "",
+  email: "",
+  phone: "",
+  role: "learner",
+  plan: "free",
+  expiresAt: null,
 }
 
 export default function UserManagementPage() {
@@ -186,19 +212,14 @@ export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [roleFilter, setRoleFilter] = useState<string>("all")
   const [planFilter, setPlanFilter] = useState<string>("all")
+  const [expirationFilter, setExpirationFilter] = useState<string>("all")
   const [isLoading, setIsLoading] = useState(false)
   const [editUser, setEditUser] = useState<User | null>(null)
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false)
   const [passwordResetEmail, setPasswordResetEmail] = useState("")
   const [newUserDialog, setNewUserDialog] = useState(false)
-  const [newUser, setNewUser] = useState<Omit<User, "id" | "lastUpdated">>({
-    name: "",
-    email: "",
-    phone: "",
-    role: "learner",
-    plan: "free",
-  })
+  const [newUser, setNewUser] = useState<Omit<User, "id" | "lastUpdated">>(initialNewUserState)
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -220,6 +241,12 @@ export default function UserManagementPage() {
     }
   }, [isAdmin, router, toast])
 
+  // Check if a user's subscription is expired
+  const isExpired = (user: User) => {
+    if (user.plan !== "premium" || !user.expiresAt) return false
+    return new Date(user.expiresAt) < new Date()
+  }
+
   // Apply filters and search
   const filteredUsers = users
     .filter((user) => {
@@ -231,7 +258,14 @@ export default function UserManagementPage() {
       const matchesRole = roleFilter === "all" || user.role === roleFilter
       const matchesPlan = planFilter === "all" || user.plan === planFilter
 
-      return matchesSearch && matchesRole && matchesPlan
+      // Apply expiration filter
+      const matchesExpiration =
+        expirationFilter === "all" ||
+        (expirationFilter === "expired" && isExpired(user)) ||
+        (expirationFilter === "active" && user.plan === "premium" && !isExpired(user)) ||
+        (expirationFilter === "never" && user.plan === "premium" && !user.expiresAt)
+
+      return matchesSearch && matchesRole && matchesPlan && matchesExpiration
     })
     // Sort by lastUpdated (newest first)
     .sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())
@@ -315,6 +349,7 @@ export default function UserManagementPage() {
     }, 1000)
   }
 
+  // Add expiresAt field to the Add User dialog
   const handleAddUser = () => {
     setIsLoading(true)
 
@@ -331,17 +366,12 @@ export default function UserManagementPage() {
         role: newUser.role,
         plan: newUser.plan,
         lastUpdated: now,
+        expiresAt: newUser.plan === "premium" ? newUser.expiresAt : null,
       }
 
       setUsers((prevUsers) => [userToAdd, ...prevUsers])
       setNewUserDialog(false)
-      setNewUser({
-        name: "",
-        email: "",
-        phone: "",
-        role: "learner",
-        plan: "free",
-      })
+      setNewUser(initialNewUserState)
       setIsLoading(false)
       setCurrentPage(1) // Reset to first page to show the new user
 
@@ -356,6 +386,7 @@ export default function UserManagementPage() {
     setSearchTerm("")
     setRoleFilter("all")
     setPlanFilter("all")
+    setExpirationFilter("all")
     setCurrentPage(1) // Reset to first page when filters change
   }
 
@@ -368,7 +399,7 @@ export default function UserManagementPage() {
 
       {/* Search and filters */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-1 items-center gap-2">
+        <div className="flex flex-1 items-center gap-2 flex-wrap">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -420,7 +451,27 @@ export default function UserManagementPage() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          {(searchTerm || roleFilter !== "all" || planFilter !== "all") && (
+          <Select
+            value={expirationFilter}
+            onValueChange={(value) => {
+              setExpirationFilter(value)
+              setCurrentPage(1) // Reset to first page when filter changes
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by expiration" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Expiration Status</SelectLabel>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="active">Active Premium</SelectItem>
+                <SelectItem value="expired">Expired Premium</SelectItem>
+                <SelectItem value="never">Never Expires</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          {(searchTerm || roleFilter !== "all" || planFilter !== "all" || expirationFilter !== "all") && (
             <Button variant="ghost" size="icon" onClick={resetFilters}>
               <X className="h-4 w-4" />
             </Button>
@@ -498,6 +549,25 @@ export default function UserManagementPage() {
                   </SelectContent>
                 </Select>
               </div>
+              {newUser.plan === "premium" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="expiresAt">Expires After</Label>
+                  <Input
+                    id="expiresAt"
+                    type="date"
+                    value={newUser.expiresAt ? new Date(newUser.expiresAt).toISOString().split("T")[0] : ""}
+                    onChange={(e) => {
+                      const date = e.target.value ? new Date(e.target.value) : null
+                      setNewUser({
+                        ...newUser,
+                        expiresAt: date ? date.toISOString() : null,
+                      })
+                    }}
+                    placeholder="Expiration Date"
+                  />
+                  <p className="text-xs text-muted-foreground">Leave empty for never expiring premium</p>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setNewUserDialog(false)}>
@@ -522,13 +592,14 @@ export default function UserManagementPage() {
               <TableHead>Role</TableHead>
               <TableHead>Plan</TableHead>
               <TableHead>Last Updated</TableHead>
+              <TableHead>Expires After</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {currentUsers.length > 0 ? (
               currentUsers.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow key={user.id} className={isExpired(user) ? "bg-red-50" : ""}>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.phone}</TableCell>
@@ -543,12 +614,19 @@ export default function UserManagementPage() {
                   <TableCell>
                     <Badge
                       variant={user.plan === "premium" ? "default" : "outline"}
-                      className={user.plan === "premium" ? "bg-primary" : ""}
+                      className={user.plan === "premium" ? (isExpired(user) ? "bg-destructive" : "bg-primary") : ""}
                     >
-                      {user.plan === "premium" ? "Premium" : "Free"}
+                      {user.plan === "premium" ? (isExpired(user) ? "Expired" : "Premium") : "Free"}
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDateTime(user.lastUpdated)}</TableCell>
+                  <TableCell>
+                    {user.plan === "premium" && user.expiresAt
+                      ? formatDateTime(user.expiresAt)
+                      : user.plan === "premium"
+                        ? "Never"
+                        : "-"}
+                  </TableCell>
                   <TableCell className="flex justify-end gap-2">
                     <Button variant="ghost" size="icon" onClick={() => handleEditUser(user)}>
                       <UserCog className="h-4 w-4" />
@@ -604,7 +682,7 @@ export default function UserManagementPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   No users found.
                 </TableCell>
               </TableRow>
@@ -737,6 +815,25 @@ export default function UserManagementPage() {
                   </SelectContent>
                 </Select>
               </div>
+              {editUser.plan === "premium" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-expiresAt">Expires After</Label>
+                  <Input
+                    id="edit-expiresAt"
+                    type="date"
+                    value={editUser.expiresAt ? new Date(editUser.expiresAt).toISOString().split("T")[0] : ""}
+                    onChange={(e) => {
+                      const date = e.target.value ? new Date(e.target.value) : null
+                      setEditUser({
+                        ...editUser,
+                        expiresAt: date ? date.toISOString() : null,
+                      })
+                    }}
+                    placeholder="Expiration Date"
+                  />
+                  <p className="text-xs text-muted-foreground">Leave empty for never expiring premium</p>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowEditDialog(false)}>

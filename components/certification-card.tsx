@@ -41,7 +41,9 @@ export function CertificationCard({
         {isComingSoon ? (
           <div className="w-full h-48 relative">
             <Image
-              src="/placeholder.svg?height=200&width=360&text=Coming+Soon"
+              src={
+                image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2940&auto=format&fit=crop"
+              }
               alt={title}
               width={360}
               height={200}
@@ -54,7 +56,9 @@ export function CertificationCard({
         ) : (
           <Link href={`/certifications/${id}`} className="block">
             <Image
-              src={`/placeholder.svg?height=200&width=360&text=${encodeURIComponent(title)}`}
+              src={
+                image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2940&auto=format&fit=crop"
+              }
               alt={title}
               width={360}
               height={200}
@@ -97,7 +101,24 @@ export function CertificationCard({
             </Button>
           ) : (
             <Link href={`/certifications/${id}`} className="w-full">
-              <Button className="w-full">Start Practicing</Button>
+              <Button className="w-full group">
+                Start Practicing
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </Button>
             </Link>
           )}
         </div>

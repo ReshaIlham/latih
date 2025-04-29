@@ -5,6 +5,7 @@ import { CertificationCard } from "@/components/certification-card"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, BookOpen, Clock, BarChart3 } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/lib/auth-provider"
 
 // Updated certifications data with three options including PMP
 const certifications = [
@@ -12,7 +13,7 @@ const certifications = [
     id: "psm",
     title: "Professional Scrum Master (PSM)",
     description: "Learn the role and responsibilities of a Scrum Master in agile development",
-    image: "/images/psm-certification.jpg",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop",
     questionCount: 120,
     domainCount: 3,
     testTypeCount: 3,
@@ -22,7 +23,7 @@ const certifications = [
     id: "pspo",
     title: "Professional Scrum Product Owner (PSPO)",
     description: "Master the skills needed to be an effective Product Owner in Scrum",
-    image: "/images/pspo-certification.jpg",
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=2940&auto=format&fit=crop",
     questionCount: 95,
     domainCount: 3,
     testTypeCount: 3,
@@ -32,7 +33,7 @@ const certifications = [
     id: "pmp",
     title: "Project Management Professional (PMP)",
     description: "Prepare for the globally recognized project management certification from PMI",
-    image: "/images/pmp-certification.jpg",
+    image: "https://images.unsplash.com/photo-1542626991-cbc4e32524cc?q=80&w=2940&auto=format&fit=crop",
     questionCount: 200,
     domainCount: 4,
     testTypeCount: 3,
@@ -65,6 +66,8 @@ const itemVariants = {
 }
 
 export default function CertificationsPage() {
+  const { user } = useAuth()
+
   return (
     <motion.div className="container py-10 md:py-16" initial="hidden" animate="visible" variants={containerVariants}>
       <motion.div className="mb-8 text-center" variants={itemVariants}>
@@ -113,16 +116,18 @@ export default function CertificationsPage() {
       <motion.div className="mb-12" variants={itemVariants}>
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to get certified?</h2>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+          <p className={`text-muted-foreground max-w-2xl mx-auto ${user ? "mb-2" : "mb-6"}`}>
             Our practice tests are designed to help you pass your certification exam on the first try. Choose a
             certification below to get started.
           </p>
-          <Link href="/signup">
-            <Button size="lg" className="shadow-md">
-              Create Free Account
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          {!user && (
+            <Link href="/signup">
+              <Button size="lg" className="shadow-md">
+                Create Free Account
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          )}
         </div>
       </motion.div>
 
@@ -148,11 +153,21 @@ export default function CertificationsPage() {
         <p className="text-muted-foreground mb-6">
           We're constantly adding new certifications to our platform. Check back soon for more options.
         </p>
-        <Link href="/pricing">
-          <Button variant="outline" size="lg">
-            View Pricing Plans
-          </Button>
-        </Link>
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href="/pricing">
+            <Button variant="outline" size="lg">
+              View Pricing Plans
+            </Button>
+          </Link>
+          {user && (
+            <Link href="/mentoring">
+              <Button size="lg" className="shadow-md">
+                Book Mentoring Session
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          )}
+        </div>
       </motion.div>
     </motion.div>
   )
