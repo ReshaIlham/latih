@@ -7,7 +7,6 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/lib/auth-provider"
-import { useSubscription } from "@/lib/subscription-provider"
 import { ArrowRight, BookOpen, Clock, BarChart3, Trophy, TrendingUp, ListChecks, LayoutGrid, Play } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -45,7 +44,7 @@ const recentTests = [
   },
 ]
 
-// Update the recommendedCertifications array with Unsplash images
+// Update the recommendedCertifications array with pricing information
 const recommendedCertifications = [
   {
     id: "psm",
@@ -55,6 +54,9 @@ const recommendedCertifications = [
     questionCount: 120,
     domainCount: 3,
     testTypeCount: 3,
+    original_price: 199000,
+    discount_price: 149000,
+    isPurchased: true,
   },
   {
     id: "pspo",
@@ -64,6 +66,9 @@ const recommendedCertifications = [
     questionCount: 95,
     domainCount: 3,
     testTypeCount: 3,
+    original_price: 199000,
+    discount_price: null,
+    isPurchased: false,
   },
 ]
 
@@ -101,7 +106,6 @@ const itemVariants = {
 
 export default function MyCertificationsPage() {
   const { user, isLoading: authLoading } = useAuth()
-  const { status, hasAccess } = useSubscription()
   const router = useRouter()
 
   // Redirect to login if not authenticated
@@ -123,6 +127,16 @@ export default function MyCertificationsPage() {
     )
   }
 
+  // Format price to IDR
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
+  }
+
   return (
     <motion.div className="container py-10 md:py-16" initial="hidden" animate="visible" variants={containerVariants}>
       <motion.div className="mb-8" variants={itemVariants}>
@@ -131,29 +145,6 @@ export default function MyCertificationsPage() {
         </h1>
         <p className="text-muted-foreground">Track your progress and continue your certification journey</p>
       </motion.div>
-
-      {/* Subscription Status */}
-      {!hasAccess && (
-        <motion.div variants={itemVariants}>
-          <Card className="mb-8 bg-primary/5 border-primary/20">
-            <CardHeader>
-              <CardTitle>Upgrade Your Plan</CardTitle>
-              <CardDescription>Get full access to all certifications and test types</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>
-                You are currently on the <span className="font-semibold">{status.tier}</span> plan. Upgrade to unlock
-                more features and certifications.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Link href="/pricing">
-                <Button>View Plans</Button>
-              </Link>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      )}
 
       <motion.div className="grid gap-6 md:grid-cols-3" variants={containerVariants}>
         {/* Quick Stats */}
@@ -331,10 +322,29 @@ export default function MyCertificationsPage() {
                           <span>{cert.testTypeCount} Test Types</span>
                         </div>
                       </div>
+                      {/* Price display */}
+                      <div>
+                        {cert.isPurchased ? (
+                          <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Purchased</span>
+                        ) : cert.discount_price ? (
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-primary">{formatPrice(cert.discount_price)}</span>
+                            <span className="text-xs text-muted-foreground line-through">
+                              {formatPrice(cert.original_price)}
+                            </span>
+                            <span className="text-xs text-green-600">
+                              {Math.round((1 - cert.discount_price / cert.original_price) * 100)}% OFF
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="text-sm font-bold text-primary">{formatPrice(cert.original_price)}</div>
+                        )}
+                        {!cert.isPurchased && <div className="text-xs text-muted-foreground">per month</div>}
+                      </div>
                       <div className="flex justify-end">
                         <Link href={`/certifications/${cert.id}`}>
                           <Button variant="ghost" size="sm" className="gap-1 hover:text-primary">
-                            Start Practicing
+                            {cert.isPurchased ? "Continue Learning" : "Subscribe Now"}
                             <ArrowRight className="h-4 w-4" />
                           </Button>
                         </Link>

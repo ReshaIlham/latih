@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { CertificationCard } from "@/components/certification-card"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, BookOpen, Clock, BarChart3 } from "lucide-react"
+import { Users, CreditCard } from "lucide-react"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth-provider"
 
@@ -18,6 +18,8 @@ const certifications = [
     domainCount: 3,
     testTypeCount: 3,
     isComingSoon: false,
+    original_price: 199000,
+    discount_price: 149000,
   },
   {
     id: "pspo",
@@ -28,6 +30,8 @@ const certifications = [
     domainCount: 3,
     testTypeCount: 3,
     isComingSoon: false,
+    original_price: 199000,
+    discount_price: null,
   },
   {
     id: "pmp",
@@ -38,6 +42,16 @@ const certifications = [
     domainCount: 4,
     testTypeCount: 3,
     isComingSoon: true,
+    original_price: 249000,
+    discount_price: null,
+  },
+]
+
+// Add mock subscription data with expiry dates
+const userSubscriptions = [
+  {
+    certificationId: "psm",
+    expiryDate: "June 15, 2025",
   },
 ]
 
@@ -65,8 +79,19 @@ const itemVariants = {
   },
 }
 
+// Update the component to pass expiry dates to certification cards
 export default function CertificationsPage() {
   const { user } = useAuth()
+
+  // Mock data for user's purchased certifications
+  const userPurchasedCertifications = user ? ["psm"] : []
+
+  // Get expiry date for a certification
+  const getExpiryDate = (certId: string) => {
+    if (!user) return undefined
+    const subscription = userSubscriptions.find((sub) => sub.certificationId === certId)
+    return subscription?.expiryDate
+  }
 
   return (
     <motion.div className="container py-10 md:py-16" initial="hidden" animate="visible" variants={containerVariants}>
@@ -75,60 +100,6 @@ export default function CertificationsPage() {
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Prepare for your certification exams with our comprehensive exam simulator and test explanation
         </p>
-      </motion.div>
-
-      {/* Feature highlights */}
-      <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" variants={containerVariants}>
-        <motion.div
-          className="bg-primary/5 rounded-xl p-6 text-center flex flex-col items-center"
-          variants={itemVariants}
-        >
-          <div className="bg-primary/10 p-3 rounded-full mb-4">
-            <BookOpen className="h-6 w-6 text-primary" />
-          </div>
-          <h3 className="font-bold text-lg mb-2">Comprehensive Content</h3>
-          <p className="text-muted-foreground">Over 200 practice questions covering all exam domains</p>
-        </motion.div>
-
-        <motion.div
-          className="bg-primary/5 rounded-xl p-6 text-center flex flex-col items-center"
-          variants={itemVariants}
-        >
-          <div className="bg-primary/10 p-3 rounded-full mb-4">
-            <Clock className="h-6 w-6 text-primary" />
-          </div>
-          <h3 className="font-bold text-lg mb-2">Realistic Simulations</h3>
-          <p className="text-muted-foreground">Timed tests that mimic the actual certification exam experience</p>
-        </motion.div>
-
-        <motion.div
-          className="bg-primary/5 rounded-xl p-6 text-center flex flex-col items-center"
-          variants={itemVariants}
-        >
-          <div className="bg-primary/10 p-3 rounded-full mb-4">
-            <BarChart3 className="h-6 w-6 text-primary" />
-          </div>
-          <h3 className="font-bold text-lg mb-2">Performance Analytics</h3>
-          <p className="text-muted-foreground">Track your progress and identify areas for improvement</p>
-        </motion.div>
-      </motion.div>
-
-      <motion.div className="mb-12" variants={itemVariants}>
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to get certified?</h2>
-          <p className={`text-muted-foreground max-w-2xl mx-auto ${user ? "mb-2" : "mb-6"}`}>
-            Our practice tests are designed to help you pass your certification exam on the first try. Choose a
-            certification below to get started.
-          </p>
-          {!user && (
-            <Link href="/signup">
-              <Button size="lg" className="shadow-md">
-                Create Free Account
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          )}
-        </div>
       </motion.div>
 
       <motion.div className="grid gap-8 md:grid-cols-3" variants={containerVariants}>
@@ -143,6 +114,13 @@ export default function CertificationsPage() {
               domainCount={cert.domainCount}
               testTypeCount={cert.testTypeCount}
               isComingSoon={cert.isComingSoon}
+              original_price={cert.original_price}
+              discount_price={cert.discount_price}
+              isPurchased={userPurchasedCertifications.includes(cert.id)}
+              expiryDate={getExpiryDate(cert.id)}
+              isPopular={false}
+              hideExtendButton={true}
+              buttonText="Start for Free Now"
             />
           </motion.div>
         ))}
@@ -151,22 +129,22 @@ export default function CertificationsPage() {
       <motion.div className="mt-16 text-center" variants={itemVariants}>
         <h2 className="text-2xl font-bold mb-4">Need more options?</h2>
         <p className="text-muted-foreground mb-6">
-          We're constantly adding new certifications to our platform. Check back soon for more options.
+          We're constantly adding new certifications to our platform. Check back soon for more options, subscribe to our
+          plans, or book a mentoring session for personalized guidance.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/pricing">
-            <Button variant="outline" size="lg">
-              View Pricing Plans
+          <Link href="/subscription">
+            <Button size="lg" className="shadow-md gap-2">
+              <CreditCard className="h-4 w-4" />
+              View Subscription Plans
             </Button>
           </Link>
-          {user && (
-            <Link href="/mentoring">
-              <Button size="lg" className="shadow-md">
-                Book Mentoring Session
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          )}
+          <Link href="/mentoring">
+            <Button size="lg" className="shadow-md gap-2">
+              <Users className="h-4 w-4" />
+              Book Mentoring Session
+            </Button>
+          </Link>
         </div>
       </motion.div>
     </motion.div>

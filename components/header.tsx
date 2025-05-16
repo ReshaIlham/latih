@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { User, LogOut, Settings, Menu, BookOpen, LayoutDashboard, Users, CreditCard, Phone } from "lucide-react"
+import { User, LogOut, Settings, Menu, BookOpen, LayoutDashboard, Users, Phone, CreditCard } from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function Header() {
@@ -67,6 +67,16 @@ export default function Header() {
           href: "/certifications",
           icon: BookOpen,
         },
+        {
+          name: "Subscriptions",
+          href: "/subscription",
+          icon: CreditCard,
+        },
+        {
+          name: "Mentoring Sessions",
+          href: "/mentoring",
+          icon: Users,
+        },
       ]
     }
     // Items for learner users - reordered as requested and added mentoring session
@@ -83,14 +93,14 @@ export default function Header() {
           icon: BookOpen,
         },
         {
+          name: "Subscriptions",
+          href: "/subscription",
+          icon: CreditCard,
+        },
+        {
           name: "Mentoring Sessions",
           href: "/mentoring",
           icon: Users,
-        },
-        {
-          name: "Pricing",
-          href: "/pricing",
-          icon: CreditCard,
         },
       ]
     }
@@ -103,9 +113,14 @@ export default function Header() {
           icon: BookOpen,
         },
         {
-          name: "Pricing",
-          href: "/pricing",
+          name: "Subscriptions",
+          href: "/subscription",
           icon: CreditCard,
+        },
+        {
+          name: "Mentoring Sessions",
+          href: "/mentoring",
+          icon: Users,
         },
       ]
     }
@@ -141,6 +156,16 @@ export default function Header() {
           href: "/certifications",
           icon: BookOpen,
         },
+        {
+          name: "Subscriptions",
+          href: "/subscription",
+          icon: CreditCard,
+        },
+        {
+          name: "Mentoring Sessions",
+          href: "/mentoring",
+          icon: Users,
+        },
       ]
     }
     // Items for learner users
@@ -157,14 +182,14 @@ export default function Header() {
           icon: BookOpen,
         },
         {
+          name: "Subscriptions",
+          href: "/subscription",
+          icon: CreditCard,
+        },
+        {
           name: "Mentoring Sessions",
           href: "/mentoring",
           icon: Users,
-        },
-        {
-          name: "Pricing",
-          href: "/pricing",
-          icon: CreditCard,
         },
       ]
     }
@@ -177,9 +202,14 @@ export default function Header() {
           icon: BookOpen,
         },
         {
-          name: "Pricing",
-          href: "/pricing",
+          name: "Subscriptions",
+          href: "/subscription",
           icon: CreditCard,
+        },
+        {
+          name: "Mentoring Sessions",
+          href: "/mentoring",
+          icon: Users,
         },
       ]
     }

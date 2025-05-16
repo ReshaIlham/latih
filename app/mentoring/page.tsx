@@ -1,11 +1,11 @@
 "use client"
-import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/lib/auth-provider"
-import { Calendar, Clock, CheckCircle, ArrowRight, ExternalLink } from "lucide-react"
+import { Calendar, Clock, CheckCircle, ExternalLink, Coins, CreditCard, MessageSquare } from "lucide-react"
+import Link from "next/link"
 
 export default function MentoringPage() {
   const { user } = useAuth()
@@ -14,9 +14,22 @@ export default function MentoringPage() {
   // External booking link - replace with your actual booking link
   const bookingLink = "https://calendly.com/latih-mentoring/session"
 
-  if (!user) {
-    router.push("/login")
-    return null
+  // Mock user credits - in a real app, this would come from your backend
+  const userCredits = user ? 2 : 0 // Example: logged in users have 2 credits
+  const sessionCreditCost = 1 // Each session costs 1 credit
+
+  // Handle booking button click
+  const handleBooking = () => {
+    if (!user) {
+      // Redirect to login page if user is not logged in
+      router.push("/login")
+    } else if (userCredits < sessionCreditCost) {
+      // Redirect to buy credits if user doesn't have enough credits
+      router.push("/mentoring/buy-credits")
+    } else {
+      // Open booking link in a new tab if user is logged in and has enough credits
+      window.open(bookingLink, "_blank", "noopener,noreferrer")
+    }
   }
 
   return (
@@ -27,6 +40,38 @@ export default function MentoringPage() {
           Get personalized guidance from our expert mentors to accelerate your certification journey.
         </p>
       </div>
+
+      {user && (
+        <Card className="mb-8">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Coins className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Your Mentoring Credits</p>
+                  <p className="text-2xl font-bold">{userCredits} Credits</p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Link href="/mentoring/buy-credits">
+                  <Button variant="outline" className="gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    Buy Credits
+                  </Button>
+                </Link>
+                <Link href="/mentoring/credit-history">
+                  <Button variant="ghost" className="gap-2">
+                    <Clock className="h-4 w-4" />
+                    View History
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
@@ -58,7 +103,7 @@ export default function MentoringPage() {
                   <div className="flex items-start gap-2">
                     <Clock className="h-5 w-5 text-primary mt-0.5" />
                     <div>
-                      <h4 className="font-medium">60-minute session</h4>
+                      <h4 className="font-medium">30-minute session</h4>
                       <p className="text-sm text-muted-foreground">Focused time with your mentor</p>
                     </div>
                   </div>
@@ -96,14 +141,16 @@ export default function MentoringPage() {
                 <div className="flex items-center justify-between bg-primary/5 p-4 rounded-md">
                   <div>
                     <p className="font-medium">Individual Session</p>
-                    <p className="text-2xl font-bold">$99</p>
-                    <p className="text-sm text-muted-foreground">Per 60-minute session</p>
+                    <div className="flex items-center gap-1">
+                      <Coins className="h-4 w-4 text-primary" />
+                      <p className="text-2xl font-bold">{sessionCreditCost} Credit</p>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Per 30-minute session</p>
                   </div>
-                  <Link href={bookingLink} target="_blank" rel="noopener noreferrer">
-                    <Button className="gap-2">
-                      Book Now <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                  <Button className="gap-2" onClick={handleBooking}>
+                    {!user ? "Login to Book" : userCredits < sessionCreditCost ? "Buy Credits" : "Book Now"}
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -120,10 +167,10 @@ export default function MentoringPage() {
                     1
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-medium">Book Your Session</h3>
+                    <h3 className="font-medium">Purchase Credits</h3>
                     <p className="text-muted-foreground">
-                      Choose your preferred date and time through our booking system. You'll receive a confirmation
-                      email with all the details.
+                      Buy mentoring credits through our secure payment system or get them as a bonus with your
+                      certification subscriptions.
                     </p>
                   </div>
                 </div>
@@ -133,10 +180,9 @@ export default function MentoringPage() {
                     2
                   </div>
                   <div className="space-y-1">
-                    <h3 className="font-medium">Payment Confirmation</h3>
+                    <h3 className="font-medium">Book Your Session</h3>
                     <p className="text-muted-foreground">
-                      Our team will contact you regarding payment options. Once payment is confirmed, your session is
-                      secured.
+                      Choose your preferred date and time through our booking system. Each session costs 1 credit.
                     </p>
                   </div>
                 </div>
@@ -185,6 +231,61 @@ export default function MentoringPage() {
         </div>
 
         <div className="lg:col-span-1 space-y-8">
+          <Card>
+            <CardHeader>
+              <CardTitle>Buy Mentoring Credits</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="p-4 border rounded-md flex flex-col items-center text-center">
+                  <Coins className="h-8 w-8 text-primary mb-2" />
+                  <h3 className="font-medium">1 Credit</h3>
+                  <p className="text-2xl font-bold">IDR 99,000</p>
+                  <p className="text-sm text-muted-foreground mb-4">One 30-minute session</p>
+                  <Link href={`/mentoring/buy-credits?amount=1`} className="w-full">
+                    <Button className="w-full">Buy Now</Button>
+                  </Link>
+                </div>
+
+                <div className="p-4 border rounded-md flex flex-col items-center text-center relative overflow-hidden">
+                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs px-2 py-1">
+                    POPULAR
+                  </div>
+                  <Coins className="h-8 w-8 text-primary mb-2" />
+                  <h3 className="font-medium">3 Credits</h3>
+                  <p className="text-2xl font-bold">IDR 269,000</p>
+                  <p className="text-sm text-muted-foreground">
+                    <span className="line-through">IDR 297,000</span> (Save 10%)
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">Three 30-minute sessions</p>
+                  <Link href={`/mentoring/buy-credits?amount=3`} className="w-full">
+                    <Button className="w-full">Buy Now</Button>
+                  </Link>
+                </div>
+
+                <div className="p-4 border rounded-md flex flex-col items-center text-center">
+                  <Coins className="h-8 w-8 text-primary mb-2" />
+                  <h3 className="font-medium">5 Credits</h3>
+                  <p className="text-2xl font-bold">IDR 399,000</p>
+                  <p className="text-sm text-muted-foreground">
+                    <span className="line-through">IDR 495,000</span> (Save 20%)
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">Five 30-minute sessions</p>
+                  <Link href={`/mentoring/buy-credits?amount=5`} className="w-full">
+                    <Button className="w-full">Buy Now</Button>
+                  </Link>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 pt-2">
+                <MessageSquare className="h-4 w-4 text-primary" />
+                <Link href="https://wa.me/628123456789" className="text-sm text-primary hover:underline">
+                  Need help? Contact us via WhatsApp
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Meet Our Mentors</CardTitle>
@@ -297,9 +398,10 @@ export default function MentoringPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Link href={bookingLink} target="_blank" rel="noopener noreferrer">
+              <Link href="/mentoring/buy-credits" className="w-full">
                 <Button className="w-full gap-2">
-                  Book Your Session Now <ArrowRight className="h-4 w-4" />
+                  <Coins className="h-4 w-4" />
+                  Buy Mentoring Credits
                 </Button>
               </Link>
             </CardFooter>
@@ -311,21 +413,24 @@ export default function MentoringPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <h3 className="font-medium">How long are the sessions?</h3>
-                <p className="text-sm text-muted-foreground">Each mentoring session is 60 minutes long.</p>
+                <h3 className="font-medium">How do mentoring credits work?</h3>
+                <p className="text-sm text-muted-foreground">
+                  Each credit allows you to book one 30-minute mentoring session. Credits never expire.
+                </p>
               </div>
 
               <div className="space-y-2">
                 <h3 className="font-medium">What if I need to reschedule?</h3>
                 <p className="text-sm text-muted-foreground">
-                  You can reschedule up to 24 hours before your session at no additional cost.
+                  You can reschedule up to 24 hours before your session at no additional cost. Your credit will only be
+                  used when the session occurs.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">How do I pay for sessions?</h3>
+                <h3 className="font-medium">Can I get credits with my certification subscription?</h3>
                 <p className="text-sm text-muted-foreground">
-                  After booking, our team will contact you with payment options including credit card and bank transfer.
+                  Yes! Our 3, 6, and 12-month certification subscriptions include bonus mentoring credits.
                 </p>
               </div>
 

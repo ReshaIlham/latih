@@ -7,6 +7,7 @@ export interface User {
   email: string
   image?: string | null
   role: UserRole
+  // Plan field removed as requested
 }
 
 // Certification Types
@@ -18,6 +19,9 @@ export interface Certification {
   name: string
   description: string
   image?: string
+  original_price: number // Added original price field
+  discount_price: number | null // Added discount price field
+  isPopular?: boolean // Added isPopular field
   createdAt: Date
   updatedAt: Date
 }
@@ -64,13 +68,11 @@ export interface UserProgress {
   lastTestAt: Date
 }
 
-// Subscription Types
-export type SubscriptionTier = "free" | "basic" | "premium"
-
-export interface Subscription {
+// User Purchases
+export interface UserPurchase {
   userId: string
-  tier: SubscriptionTier
-  isActive: boolean
-  startedAt: Date
+  certificationId: string
+  purchasedAt: Date
   expiresAt: Date | null
+  isActive: boolean
 }

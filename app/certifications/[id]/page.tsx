@@ -11,8 +11,27 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/auth-provider"
 import { useSubscription } from "@/lib/subscription-provider"
-import { Clock, FileQuestion, BookOpen, ArrowLeft, LayoutGrid, ListChecks, BarChart3 } from "lucide-react"
+import {
+  Clock,
+  FileQuestion,
+  BookOpen,
+  ArrowLeft,
+  LayoutGrid,
+  ListChecks,
+  BarChart3,
+  Lock,
+  CheckCircle,
+  Coins,
+} from "lucide-react"
 import type { TestType } from "@/lib/types"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog"
 
 // Mock certification data
 const certificationData = {
@@ -32,6 +51,8 @@ const certificationData = {
       { id: "medium", name: "Medium Test", questions: 30, time: 45, isPremium: true },
       { id: "full", name: "Full Test", questions: 80, time: 120, isPremium: true },
     ],
+    original_price: 199000,
+    discount_price: 149000,
   },
   pspo: {
     id: "pspo",
@@ -49,6 +70,8 @@ const certificationData = {
       { id: "medium", name: "Medium Test", questions: 30, time: 45, isPremium: true },
       { id: "full", name: "Full Test", questions: 80, time: 120, isPremium: true },
     ],
+    original_price: 199000,
+    discount_price: null,
   },
   pmp: {
     id: "pmp",
@@ -67,6 +90,8 @@ const certificationData = {
       { id: "medium", name: "Medium Test", questions: 30, time: 45, isPremium: true },
       { id: "full", name: "Full Test", questions: 80, time: 120, isPremium: true },
     ],
+    original_price: 249000,
+    discount_price: 199000,
   },
 }
 
@@ -112,6 +137,7 @@ const mockUserProgress = {
 export default function CertificationDetailPage({ params }: { params: { id: string } }) {
   const [selectedTestType, setSelectedTestType] = useState<TestType>("short")
   const [selectedDomains, setSelectedDomains] = useState<string[]>([])
+  const [showPremiumFeatureModal, setShowPremiumFeatureModal] = useState(false)
   const { user } = useAuth()
   const { hasAccess } = useSubscription()
   const { toast } = useToast()
@@ -143,6 +169,19 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
     }
   }
 
+  const handleTestTypeChange = (value: string) => {
+    const testType = value as TestType
+    const isTestTypePremium = certification.testTypes.find((type) => type.id === testType)?.isPremium
+
+    if (isTestTypePremium && !hasAccess) {
+      // Show premium feature modal but don't change the selected test type
+      setShowPremiumFeatureModal(true)
+    } else {
+      // Only change the selected test type if user has access or it's not premium
+      setSelectedTestType(testType)
+    }
+  }
+
   const handleStartTest = () => {
     if (!user) {
       toast({
@@ -166,12 +205,7 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
     const isPremiumTest = certification.testTypes.find((type) => type.id === selectedTestType)?.isPremium
 
     if (isPremiumTest && !hasAccess) {
-      toast({
-        title: "Premium content",
-        description: "Please upgrade your subscription to access this test type.",
-        variant: "destructive",
-      })
-      router.push("/pricing")
+      setShowPremiumFeatureModal(true)
       return
     }
 
@@ -179,10 +213,37 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
     router.push(`/take-test?certification=${params.id}&type=${selectedTestType}&domains=${selectedDomains.join(",")}`)
   }
 
+  const handleSubscribe = () => {
+    setShowPremiumFeatureModal(false)
+
+    if (!user) {
+      // Redirect to login page with return URL to subscription page
+      router.push(`/login?redirect=/subscription?certification=${params.id}`)
+      toast({
+        title: "Login required",
+        description: "Please log in to subscribe to premium features.",
+        variant: "destructive",
+      })
+    } else {
+      // User is logged in, redirect to subscription page
+      router.push(`/subscription?certification=${params.id}`)
+    }
+  }
+
   // Calculate total tests completed
   const getTotalTestsCompleted = () => {
     if (!userProgress) return 0
     return Object.values(userProgress.testsCompleted).reduce((sum, count) => sum + count, 0)
+  }
+
+  // Format price to IDR
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
   }
 
   return (
@@ -218,20 +279,15 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
                 <h3 className="font-medium">Select Test Type</h3>
                 <RadioGroup
                   value={selectedTestType}
-                  onValueChange={(value) => setSelectedTestType(value as TestType)}
+                  onValueChange={handleTestTypeChange}
                   className="grid gap-4 md:grid-cols-3"
                 >
                   {certification.testTypes.map((type) => (
                     <div key={type.id} className="relative">
-                      <RadioGroupItem
-                        value={type.id}
-                        id={`test-type-${type.id}`}
-                        className="peer sr-only"
-                        disabled={type.isPremium && !hasAccess}
-                      />
+                      <RadioGroupItem value={type.id} id={`test-type-${type.id}`} className="peer sr-only" />
                       <Label
                         htmlFor={`test-type-${type.id}`}
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
+                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                       >
                         <div className="mb-2 text-center font-semibold">{type.name}</div>
                         <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
@@ -245,7 +301,10 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
                           </div>
                         </div>
                         {type.isPremium && !hasAccess && (
-                          <div className="mt-2 text-xs font-semibold text-primary">Premium</div>
+                          <div className="mt-2 text-xs font-semibold text-primary flex items-center gap-1">
+                            <Lock className="h-3 w-3" />
+                            Premium
+                          </div>
                         )}
                       </Label>
                     </div>
@@ -275,7 +334,7 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleStartTest} className="w-full">
+              <Button onClick={handleStartTest} className="w-full" disabled={selectedDomains.length === 0}>
                 Start Practice Test
               </Button>
             </CardFooter>
@@ -393,6 +452,135 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
           </Card>
         </div>
       </div>
+
+      {/* Premium Feature Modal */}
+      <Dialog open={showPremiumFeatureModal} onOpenChange={setShowPremiumFeatureModal}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" />
+              Premium Feature
+            </DialogTitle>
+            <DialogDescription>Premium test types are available exclusively to subscribers.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-primary/5 p-6 rounded-lg border border-primary/20">
+              <h3 className="font-medium text-base mb-4">Subscription Details</h3>
+              <div className="space-y-4">
+                {/* Certification name and details */}
+                <div className="flex flex-col">
+                  <h4 className="text-lg font-bold text-primary">{certification.name}</h4>
+
+                  {/* Price display styled like certification cards */}
+                  <div className="mt-3 flex items-center">
+                    {certification.discount_price ? (
+                      <>
+                        <div className="flex flex-col">
+                          <div className="flex items-baseline">
+                            <span className="text-2xl font-bold text-primary">
+                              {formatPrice(certification.discount_price)}
+                            </span>
+                            <span className="text-sm ml-2 text-muted-foreground">/month</span>
+                          </div>
+                          <span className="text-sm line-through text-muted-foreground">
+                            {formatPrice(certification.original_price)}
+                          </span>
+                        </div>
+                        <div className="ml-auto">
+                          <span className="px-2.5 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                            Up to 25% OFF
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-baseline">
+                          <span className="text-2xl font-bold text-primary">
+                            {formatPrice(certification.original_price)}
+                          </span>
+                          <span className="text-sm ml-2 text-muted-foreground">/month</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Features list */}
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium mb-3">What You'll Get:</h5>
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Access to all test types</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Detailed explanations for all questions</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Unlimited practice tests</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-amber-100 flex items-center justify-center">
+                        <Coins className="h-3 w-3 text-amber-600" />
+                      </div>
+                      <span>Up to 4 free mentoring credits (worth Rp 396.000)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <h3 className="font-medium text-base mb-3">How to Subscribe</h3>
+              <div className="space-y-4">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                    1
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Choose a Subscription Method</p>
+                    <p className="text-xs text-muted-foreground">Select between payment form or WhatsApp contact</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                    2
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Complete Payment</p>
+                    <p className="text-xs text-muted-foreground">Transfer to our bank account and submit proof</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                    3
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Access Premium Features</p>
+                    <p className="text-xs text-muted-foreground">Get immediate access after verification</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowPremiumFeatureModal(false)} className="sm:flex-1">
+              Maybe Later
+            </Button>
+            <Button onClick={handleSubscribe} className="sm:flex-1">
+              Subscribe
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

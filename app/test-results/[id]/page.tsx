@@ -5,11 +5,19 @@ import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import { BackButton } from "@/components/back-button"
-import { CheckCircle, XCircle, Info } from "lucide-react"
+import { CheckCircle, XCircle, Info, Lock, Coins } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/lib/auth-provider"
 import type { Question } from "@/lib/types"
 
 // Mock test data (same as in take-test page)
@@ -213,14 +221,20 @@ const mockCertifications = {
   cert1: {
     id: "cert1",
     name: "Professional Scrum Master (PSM)",
+    original_price: 199000,
+    discount_price: 149000,
   },
   cert2: {
     id: "cert2",
     name: "Professional Scrum Product Owner (PSPO)",
+    original_price: 199000,
+    discount_price: null,
   },
   cert3: {
     id: "cert3",
     name: "Project Management Professional (PMP)",
+    original_price: 249000,
+    discount_price: 199000,
   },
 }
 
@@ -235,12 +249,17 @@ export default function TestResultsPage() {
   const router = useRouter()
   const params = useParams()
   const testId = params.id as string
+  const { user } = useAuth()
 
   const [showExplanationModal, setShowExplanationModal] = useState(false)
   const [selectedQuestionForExplanation, setSelectedQuestionForExplanation] = useState<Question | null>(null)
+  const [showPremiumFeatureModal, setShowPremiumFeatureModal] = useState(false)
 
   // Get test result data
   const testResult = mockTestResults[testId as keyof typeof mockTestResults]
+
+  // Mock user's purchased certifications
+  const userPurchasedCertifications = user ? ["cert1"] : []
 
   if (!testResult) {
     return (
@@ -260,6 +279,9 @@ export default function TestResultsPage() {
   const selectedAnswers = testResult.selectedAnswers
   const certificationId = testResult.certificationId
   const testType = testResult.testType
+
+  // Check if user has purchased this certification
+  const hasAccess = userPurchasedCertifications.includes(certificationId)
 
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -326,8 +348,12 @@ export default function TestResultsPage() {
   }
 
   const handleShowExplanation = (question: Question) => {
-    setSelectedQuestionForExplanation(question)
-    setShowExplanationModal(true)
+    if (hasAccess) {
+      setSelectedQuestionForExplanation(question)
+      setShowExplanationModal(true)
+    } else {
+      setShowPremiumFeatureModal(true)
+    }
   }
 
   const getCorrectOptionId = (question: Question) => {
@@ -337,6 +363,36 @@ export default function TestResultsPage() {
   const getSelectedOptionText = (question: Question) => {
     const selectedOptionId = selectedAnswers[question.id]
     return question.options.find((option) => option.id === selectedOptionId)?.text || "Not answered"
+  }
+
+  const handleSubscribe = () => {
+    setShowPremiumFeatureModal(false)
+    router.push(`/subscription?certification=${certificationId}`)
+  }
+
+  const handleContactAdmin = () => {
+    // Open WhatsApp with a predefined message
+    const message = `Hello, I'm interested in subscribing to the ${getCertificationName(
+      certificationId,
+    )} certification on Latih. Please provide more information.`
+    const whatsappUrl = `https://wa.me/628123456789?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, "_blank")
+    setShowPremiumFeatureModal(false)
+  }
+
+  // Format price to IDR
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
+  }
+
+  // Calculate discount percentage
+  const calculateDiscountPercentage = (original: number, discounted: number) => {
+    return Math.round(((original - discounted) / original) * 100)
   }
 
   return (
@@ -465,10 +521,10 @@ export default function TestResultsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 gap-1 text-primary"
+                          className={cn("h-8 gap-1", hasAccess ? "text-primary" : "text-muted-foreground")}
                           onClick={() => handleShowExplanation(question)}
                         >
-                          <Info className="h-3.5 w-3.5" />
+                          {hasAccess ? <Info className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
                           View
                         </Button>
                       </TableCell>
@@ -560,6 +616,141 @@ export default function TestResultsPage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Premium Feature Modal - Updated with certification card style pricing and new benefits */}
+      <Dialog open={showPremiumFeatureModal} onOpenChange={setShowPremiumFeatureModal}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" />
+              Premium Feature
+            </DialogTitle>
+            <DialogDescription>Detailed explanations are available exclusively to subscribers.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-primary/5 p-6 rounded-lg border border-primary/20">
+              <h3 className="font-medium text-base mb-4">Subscription Details</h3>
+              <div className="space-y-4">
+                {/* Certification name and details - styled like certification cards */}
+                <div className="flex flex-col">
+                  <h4 className="text-lg font-bold text-primary">{getCertificationName(certificationId)}</h4>
+
+                  {/* Price display styled like certification cards */}
+                  <div className="mt-3 flex items-center">
+                    {mockCertifications[certificationId as keyof typeof mockCertifications]?.discount_price ? (
+                      <>
+                        <div className="flex flex-col">
+                          <div className="flex items-baseline">
+                            <span className="text-2xl font-bold text-primary">
+                              {formatPrice(
+                                mockCertifications[certificationId as keyof typeof mockCertifications]?.discount_price!,
+                              )}
+                            </span>
+                            <span className="text-sm ml-2 text-muted-foreground">/month</span>
+                          </div>
+                          <span className="text-sm line-through text-muted-foreground">
+                            {formatPrice(
+                              mockCertifications[certificationId as keyof typeof mockCertifications]?.original_price,
+                            )}
+                          </span>
+                        </div>
+                        <div className="ml-auto">
+                          <span className="px-2.5 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                            Up to 25% OFF
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-baseline">
+                          <span className="text-2xl font-bold text-primary">
+                            {formatPrice(
+                              mockCertifications[certificationId as keyof typeof mockCertifications]?.original_price,
+                            )}
+                          </span>
+                          <span className="text-sm ml-2 text-muted-foreground">/month</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Features list - Updated to match the subscription page style */}
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium mb-3">What You'll Get:</h5>
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Access to all test types</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Detailed explanations for all questions</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 text-primary" />
+                      </div>
+                      <span>Unlimited practice tests</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="h-5 w-5 rounded-full bg-amber-100 flex items-center justify-center">
+                        <Coins className="h-3 w-3 text-amber-600" />
+                      </div>
+                      <span>Up to 4 free mentoring credits (worth Rp 396.000)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <h3 className="font-medium text-base mb-3">How to Subscribe</h3>
+              <div className="space-y-4">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                    1
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Choose a Subscription Method</p>
+                    <p className="text-xs text-muted-foreground">Select between payment form or WhatsApp contact</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                    2
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Complete Payment</p>
+                    <p className="text-xs text-muted-foreground">Transfer to our bank account and submit proof</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
+                    3
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">Access Premium Features</p>
+                    <p className="text-xs text-muted-foreground">Get immediate access after verification</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowPremiumFeatureModal(false)} className="sm:flex-1">
+              Maybe Later
+            </Button>
+            <Button onClick={handleSubscribe} className="sm:flex-1">
+              Subscribe
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -39,6 +39,7 @@ import {
   ListOrdered,
   Grid,
   Calendar,
+  Crown,
 } from "lucide-react"
 
 // Types
@@ -77,6 +78,7 @@ const mockCertifications = [
       { id: "t2", name: "Medium Test", timeLimit: 60, questionCount: 80, passingGrade: 75 },
       { id: "t3", name: "Full Test", timeLimit: 120, questionCount: 120, passingGrade: 80 },
     ],
+    isPopular: true,
   },
   {
     id: "pspo",
@@ -98,6 +100,7 @@ const mockCertifications = [
       { id: "t5", name: "Medium Test", timeLimit: 60, questionCount: 60, passingGrade: 75 },
       { id: "t6", name: "Full Test", timeLimit: 90, questionCount: 90, passingGrade: 80 },
     ],
+    isPopular: false,
   },
   {
     id: "pmp",
@@ -121,6 +124,7 @@ const mockCertifications = [
       { id: "t11", name: "Medium Test", timeLimit: 90, questionCount: 100, passingGrade: 75 },
       { id: "t12", name: "Full Test", timeLimit: 180, questionCount: 200, passingGrade: 80 },
     ],
+    isPopular: true,
   },
 ]
 
@@ -136,6 +140,7 @@ type Certification = {
   lastUpdated: string
   domains: Domain[]
   testTypes: TestType[]
+  isPopular: boolean
 }
 
 export default function CertificationsManagementPage() {
@@ -254,6 +259,14 @@ export default function CertificationsManagementPage() {
                   className={`w-full h-48 object-cover ${certification.status === "coming-soon" ? "filter grayscale opacity-70" : ""}`}
                 />
                 <div className="absolute top-2 right-2">{getStatusBadge(certification.status)}</div>
+                {certification.isPopular && (
+                  <div className="absolute top-2 left-2">
+                    <Badge className="bg-amber-500 text-white px-2 py-1 flex items-center gap-1">
+                      <Crown className="h-3 w-3" />
+                      Popular
+                    </Badge>
+                  </div>
+                )}
               </div>
               <div className="p-6 flex-grow flex flex-col">
                 <h3
