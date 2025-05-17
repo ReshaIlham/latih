@@ -11,10 +11,24 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { User, LogOut, Settings, Menu, BookOpen, LayoutDashboard, Users, Phone, CreditCard } from "lucide-react"
+import {
+  User,
+  LogOut,
+  Settings,
+  Menu,
+  BookOpen,
+  LayoutDashboard,
+  Users,
+  Phone,
+  CreditCard,
+  UserCog,
+  CreditCardIcon,
+  UserCheck,
+} from "lucide-react"
 import { motion } from "framer-motion"
 
 export default function Header() {
@@ -37,7 +51,34 @@ export default function Header() {
   const isAuthPage =
     pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password" || pathname === "/reset-password"
 
-  // Navigation items based on user role
+  // Update the isActivePath function to correctly handle certifications management
+  const isActivePath = (path: string) => {
+    if (path === "#") return false
+
+    // Special case for admin dashboard - only highlight if exactly at /admin
+    if (path === "/admin") {
+      return pathname === "/admin"
+    }
+
+    // Special case for certifications management
+    if (path === "/certifications-management") {
+      return pathname.startsWith("/certifications-management")
+    }
+
+    // Special case for certifications - don't highlight when in certifications-management
+    if (path === "/certifications") {
+      return (
+        pathname === "/certifications" ||
+        (pathname.startsWith("/certifications/") && !pathname.startsWith("/certifications-management"))
+      )
+    }
+
+    // For other paths, use the normal check
+    return pathname === path || (path !== "/" && pathname.startsWith(path))
+  }
+
+  // Now, let's update the navigation items to remove the specified pages
+  // Update the getNavItems function to remove the unwanted pages
   const getNavItems = () => {
     // Items for admin users - reordered as requested
     if (isAdmin) {
@@ -49,12 +90,29 @@ export default function Header() {
         },
         {
           name: "User Management",
-          href: "/admin/users",
+          href: "#",
           icon: Users,
+          children: [
+            {
+              name: "User Account",
+              href: "/users",
+              icon: UserCog,
+            },
+            {
+              name: "User Subscription",
+              href: "/user-subscriptions",
+              icon: CreditCardIcon,
+            },
+            {
+              name: "User Mentoring Session",
+              href: "/user-mentoring",
+              icon: UserCheck,
+            },
+          ],
         },
         {
           name: "Certifications Management",
-          href: "/admin/certifications",
+          href: "/certifications-management",
           icon: BookOpen,
         },
         {
@@ -126,7 +184,7 @@ export default function Header() {
     }
   }
 
-  // Mobile menu items based on user role
+  // Update the getMobileMenuItems function to remove the unwanted pages
   const getMobileMenuItems = () => {
     // Items for admin users
     if (isAdmin) {
@@ -137,13 +195,23 @@ export default function Header() {
           icon: Settings,
         },
         {
-          name: "User Management",
-          href: "/admin/users",
-          icon: Users,
+          name: "User Account",
+          href: "/users",
+          icon: UserCog,
+        },
+        {
+          name: "User Subscription",
+          href: "/user-subscriptions",
+          icon: CreditCardIcon,
+        },
+        {
+          name: "User Mentoring Session",
+          href: "/user-mentoring",
+          icon: UserCheck,
         },
         {
           name: "Certifications Management",
-          href: "/admin/certifications",
+          href: "/certifications-management",
           icon: BookOpen,
         },
         {
@@ -218,6 +286,11 @@ export default function Header() {
   const navItems = getNavItems()
   const mobileMenuItems = getMobileMenuItems()
 
+  // Check if any child path is active
+  const hasActiveChild = (children: any[]) => {
+    return children.some((child) => isActivePath(child.href))
+  }
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -242,21 +315,55 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === item.href
-                    ? "bg-primary/10 text-primary"
-                    : pathname.startsWith(item.href + "/") && item.href !== "/admin"
+            {navItems.map((item) => {
+              // Check if item has children (dropdown)
+              if (item.children) {
+                return (
+                  <DropdownMenu key={item.name}>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                          hasActiveChild(item.children)
+                            ? "bg-primary/10 text-primary"
+                            : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                        }`}
+                      >
+                        {item.name}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56">
+                      <DropdownMenuGroup>
+                        {item.children.map((child) => (
+                          <DropdownMenuItem key={child.name} asChild>
+                            <Link
+                              href={child.href}
+                              className={`flex items-center ${isActivePath(child.href) ? "bg-primary/10 text-primary" : ""}`}
+                            >
+                              <span>{child.name}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )
+              }
+
+              // Regular menu item without dropdown
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActivePath(item.href)
                       ? "bg-primary/10 text-primary"
                       : "text-foreground/70 hover:text-foreground hover:bg-accent"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
           </nav>
         </div>
 
@@ -339,11 +446,9 @@ export default function Header() {
                               key={item.href}
                               href={item.href}
                               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                pathname === item.href
+                                isActivePath(item.href)
                                   ? "bg-primary/10 text-primary"
-                                  : pathname.startsWith(item.href + "/") && item.href !== "/admin"
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
                               }`}
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
@@ -421,11 +526,9 @@ export default function Header() {
                               key={item.href}
                               href={item.href}
                               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                pathname === item.href
+                                isActivePath(item.href)
                                   ? "bg-primary/10 text-primary"
-                                  : pathname.startsWith(item.href + "/") && item.href !== "/admin"
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
                               }`}
                               onClick={() => setIsMobileMenuOpen(false)}
                             >

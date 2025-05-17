@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 
+// Update the CertificationCardProps interface to include the new props
 interface CertificationCardProps {
   id: string
   title: string
@@ -29,8 +30,12 @@ interface CertificationCardProps {
   onSubscribeClick?: () => void
   buttonText?: string
   disableNavigation?: boolean
+  buttonClassName?: string
+  hidePricing?: boolean
+  hidePopularBadge?: boolean
 }
 
+// Update the function parameters to include the new props
 export function CertificationCard({
   id,
   title,
@@ -51,6 +56,9 @@ export function CertificationCard({
   onSubscribeClick,
   buttonText = "Subscribe Now",
   disableNavigation = false,
+  buttonClassName = "",
+  hidePricing = false,
+  hidePopularBadge = false,
 }: CertificationCardProps) {
   // Format price to IDR
   const formatPrice = (price: number) => {
@@ -69,7 +77,7 @@ export function CertificationCard({
     }
   }
 
-  // Render the image section with or without navigation
+  // Update the renderImageSection function to respect the hidePopularBadge prop
   const renderImageSection = () => {
     if (isComingSoon) {
       return (
@@ -107,7 +115,7 @@ export function CertificationCard({
             </Badge>
           </div>
         )}
-        {isPopular && (
+        {isPopular && !hidePopularBadge && (
           <div className="absolute top-2 left-2">
             <Badge className="bg-amber-500 text-white px-2 py-1 flex items-center gap-1">
               <Crown className="h-3 w-3" />
@@ -197,7 +205,7 @@ export function CertificationCard({
 
     if (onSubscribeClick) {
       return (
-        <Button className="w-full group" onClick={handleSubscribeClick}>
+        <Button className={cn("w-full group", buttonClassName)} onClick={handleSubscribeClick}>
           {buttonText}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -220,7 +228,7 @@ export function CertificationCard({
 
     return (
       <Link href={`/certifications/${id}`} className="w-full">
-        <Button className="w-full group">
+        <Button className={cn("w-full group", buttonClassName)}>
           {buttonText}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -242,6 +250,7 @@ export function CertificationCard({
     )
   }
 
+  // Update the return JSX to respect the hidePricing prop
   return (
     <div
       className={cn(
@@ -271,20 +280,22 @@ export function CertificationCard({
         </div>
 
         {/* Updated Price display with "Up To" text */}
-        <div className="mb-4 bg-primary/5 p-3 rounded-lg">
-          {discount_price ? (
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-primary">{formatPrice(discount_price)}</span>
-              <span className="text-sm text-muted-foreground line-through">{formatPrice(original_price)}</span>
-              <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">
-                Up To {Math.round((1 - discount_price / original_price) * 100)}% OFF
-              </span>
-            </div>
-          ) : (
-            <div className="text-lg font-bold text-primary">{formatPrice(original_price)}</div>
-          )}
-          <div className="text-xs text-muted-foreground mt-1">per month</div>
-        </div>
+        {!hidePricing && (
+          <div className="mb-4 bg-primary/5 p-3 rounded-lg">
+            {discount_price ? (
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-primary">{formatPrice(discount_price)}</span>
+                <span className="text-sm text-muted-foreground line-through">{formatPrice(original_price)}</span>
+                <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">
+                  Up To {Math.round((1 - discount_price / original_price) * 100)}% OFF
+                </span>
+              </div>
+            ) : (
+              <div className="text-lg font-bold text-primary">{formatPrice(original_price)}</div>
+            )}
+            <div className="text-xs text-muted-foreground mt-1">per month</div>
+          </div>
+        )}
 
         {/* Subscription expiry date display */}
         {isPurchased && expiryDate && (

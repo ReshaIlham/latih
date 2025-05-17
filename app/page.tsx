@@ -155,6 +155,7 @@ export default function Home() {
               isPurchased={userPurchasedCertifications.includes("psm")}
               expiryDate={getExpiryDate("psm")}
               buttonText="Start for Free Now"
+              hideExtendButton={true}
             />
 
             {/* PSPO Certification Card - Using the standardized component */}
@@ -171,6 +172,7 @@ export default function Home() {
               isPurchased={userPurchasedCertifications.includes("pspo")}
               expiryDate={getExpiryDate("pspo")}
               buttonText="Start for Free Now"
+              hideExtendButton={true}
             />
           </div>
 

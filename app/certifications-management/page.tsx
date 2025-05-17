@@ -234,7 +234,7 @@ export default function CertificationsManagementPage() {
             </Button>
           )}
         </div>
-        <Link href="/admin/certifications/new">
+        <Link href="/certifications-management/new">
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Certification
@@ -307,13 +307,13 @@ export default function CertificationsManagementPage() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={`/admin/certifications/${certification.id}/edit`} className="cursor-pointer">
+                      <Link href={`/certifications-management/${certification.id}/edit`} className="cursor-pointer">
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href={`/admin/certifications/${certification.id}/questions`} className="cursor-pointer">
+                      <Link href={`/certifications-management/${certification.id}/question`} className="cursor-pointer">
                         <FileQuestion className="mr-2 h-4 w-4" />
                         Questions
                       </Link>
@@ -356,7 +356,7 @@ export default function CertificationsManagementPage() {
           <div className="col-span-full flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
             <h3 className="mb-2 text-lg font-semibold">No certifications found</h3>
             <p className="text-muted-foreground">Try adjusting your search or add a new certification.</p>
-            <Link href="/admin/certifications/new" className="mt-4">
+            <Link href="/certifications-management/new" className="mt-4">
               <Button>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add Certification

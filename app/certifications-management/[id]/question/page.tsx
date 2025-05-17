@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PlusCircle, Pencil, Trash2, Search, Download, ChevronLeft, ChevronRight, FileSpreadsheet } from "lucide-react"
 import { BackButton } from "@/components/back-button"
 import type { TestDomain } from "@/lib/types"
+import * as XLSX from "xlsx"
 
 // Mock questions data
 const mockQuestions = [
@@ -354,55 +355,65 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
   }
 
   const handleDownloadTemplate = () => {
-    // In a real app, we would generate and download an Excel template
+    // Create template data
+    const templateData = [
+      {
+        question: "What is the primary responsibility of a Scrum Master?",
+        domain: "role",
+        "option a": "Managing the team and assigning tasks",
+        "option b": "Facilitating Scrum events and removing impediments",
+        "option c": "Writing user stories and managing the product backlog",
+        "option d": "Reporting team progress to stakeholders",
+        "correct answer": "b",
+        explanation:
+          "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
+      },
+      {
+        question: "Which of the following is NOT a Scrum artifact?",
+        domain: "artifact",
+        "option a": "Product Backlog",
+        "option b": "Sprint Backlog",
+        "option c": "Burndown Chart",
+        "option d": "Increment",
+        "correct answer": "c",
+        explanation:
+          "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
+      },
+    ]
+
+    // Create a new workbook
+    const wb = XLSX.utils.book_new()
+
+    // Convert JSON to worksheet
+    const ws = XLSX.utils.json_to_sheet(templateData)
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Questions Template")
+
+    // Generate Excel file
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
+
+    // Create Blob and download
+    const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = "question_template.xlsx"
+    link.click()
+
+    // Clean up
+    URL.revokeObjectURL(url)
+
     toast({
       title: "Excel Template Downloaded",
       description: "The Excel template has been downloaded.",
     })
-
-    // Create a sample Excel-like content (CSV for demo)
-    const csvContent = [
-      ["question", "domain", "option a", "option b", "option c", "option d", "correct answer", "explanation"],
-      [
-        "What is the primary responsibility of a Scrum Master?",
-        "role",
-        "Managing the team and assigning tasks",
-        "Facilitating Scrum events and removing impediments",
-        "Writing user stories and managing the product backlog",
-        "Reporting team progress to stakeholders",
-        "b",
-        "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
-      ],
-      [
-        "Which of the following is NOT a Scrum artifact?",
-        "artifact",
-        "Product Backlog",
-        "Sprint Backlog",
-        "Burndown Chart",
-        "Increment",
-        "c",
-        "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
-      ],
-    ]
-      .map((row) => row.join(","))
-      .join("\n")
-
-    // Create a Blob and download it
-    const blob = new Blob([csvContent], { type: "application/vnd.ms-excel" })
-    const link = document.createElement("a")
-    const url = URL.createObjectURL(blob)
-    link.setAttribute("href", url)
-    link.setAttribute("download", "question_template.xlsx")
-    link.style.visibility = "hidden"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
   }
 
   return (
     <div className="container py-10">
       <div className="mb-8">
-        <BackButton href="/admin/certifications" />
+        <BackButton href="/certifications-management" />
         <h1 className="mt-6 text-3xl font-bold">Manage Questions</h1>
         <p className="text-muted-foreground mt-2">Certification: Scrum Master</p>
       </div>

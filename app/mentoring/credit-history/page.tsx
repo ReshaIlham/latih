@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth-provider"
-import { ArrowLeft, Calendar, Clock, Coins, Download, ExternalLink } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Coins } from "lucide-react"
 
 export default function MentoringHistoryPage() {
   const { user } = useAuth()
@@ -20,16 +20,7 @@ export default function MentoringHistoryPage() {
       type: "purchase",
       amount: 3,
       date: "2023-05-10T14:30:00Z",
-      paymentMethod: "Bank Transfer",
       paymentId: "PAY-123456",
-      status: "completed",
-    },
-    {
-      id: "ch002",
-      type: "bonus",
-      amount: 2,
-      date: "2023-04-15T09:45:00Z",
-      source: "6-month PSM I Subscription",
       status: "completed",
     },
     {
@@ -176,9 +167,7 @@ export default function MentoringHistoryPage() {
                         </div>
                       </div>
                       {transaction.type === "purchase" && (
-                        <p className="text-sm text-muted-foreground pl-10">
-                          Payment ID: {transaction.paymentId} ({transaction.paymentMethod})
-                        </p>
+                        <p className="text-sm text-muted-foreground pl-10">Payment ID: {transaction.paymentId}</p>
                       )}
                       {transaction.type === "bonus" && (
                         <p className="text-sm text-muted-foreground pl-10">Source: {transaction.source}</p>
@@ -189,7 +178,7 @@ export default function MentoringHistoryPage() {
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div>
                       <p
                         className={`text-lg font-bold ${
                           transaction.type === "purchase" || transaction.type === "bonus"
@@ -200,12 +189,6 @@ export default function MentoringHistoryPage() {
                         {transaction.type === "purchase" || transaction.type === "bonus" ? "+" : ""}
                         {transaction.amount} {Math.abs(transaction.amount) === 1 ? "Credit" : "Credits"}
                       </p>
-                      {transaction.type === "purchase" && (
-                        <Button variant="outline" size="sm" className="gap-1">
-                          <Download className="h-3 w-3" />
-                          Receipt
-                        </Button>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -248,12 +231,7 @@ export default function MentoringHistoryPage() {
                         >
                           {session.status === "completed" ? "Completed" : "Scheduled"}
                         </span>
-                        {session.status === "scheduled" && (
-                          <Button size="sm" variant="outline" className="gap-1">
-                            <ExternalLink className="h-3 w-3" />
-                            Join
-                          </Button>
-                        )}
+                        {/* Join button removed */}
                       </div>
                     </div>
                     <div className="pl-10">
@@ -269,14 +247,7 @@ export default function MentoringHistoryPage() {
                         </p>
                       )}
                     </div>
-                    {session.status === "completed" && (
-                      <div className="flex justify-end">
-                        <Button variant="outline" size="sm" className="gap-1">
-                          <Download className="h-3 w-3" />
-                          Session Notes
-                        </Button>
-                      </div>
-                    )}
+                    {/* Session notes button removed */}
                   </div>
                 ))}
               </div>

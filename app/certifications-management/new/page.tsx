@@ -122,7 +122,7 @@ export default function NewCertificationPage() {
         title: "Certification created",
         description: `${newCertification.name} certification has been created successfully.`,
       })
-      router.push("/admin/certifications")
+      router.push("/certifications-management")
     } catch (error) {
       toast({
         title: "Failed to create certification",
@@ -246,7 +246,7 @@ export default function NewCertificationPage() {
   return (
     <div className="container py-10">
       <div className="mb-8">
-        <BackButton href="/admin/certifications" />
+        <BackButton href="/certifications-management" />
         <h1 className="mt-6 text-3xl font-bold">Add New Certification</h1>
       </div>
 

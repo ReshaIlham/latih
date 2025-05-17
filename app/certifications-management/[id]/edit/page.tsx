@@ -80,10 +80,10 @@ const mockCertifications = {
       { id: "t3", name: "Full Test", timeLimit: 120, questionCount: 120, passingGrade: 80 },
     ],
     original_price: 199000,
-    certification_discount: 25,
-    duration_discount_3m: 10,
-    duration_discount_6m: 17,
-    duration_discount_12m: 25,
+    certification_discount: 25000,
+    duration_discount_3m: 150000,
+    duration_discount_6m: 350000,
+    duration_discount_12m: 750000,
     bonus_credits_1m: 0,
     bonus_credits_3m: 1,
     bonus_credits_6m: 2,
@@ -113,9 +113,9 @@ const mockCertifications = {
     ],
     original_price: 199000,
     certification_discount: 0,
-    duration_discount_3m: 10,
-    duration_discount_6m: 17,
-    duration_discount_12m: 25,
+    duration_discount_3m: 150000,
+    duration_discount_6m: 350000,
+    duration_discount_12m: 750000,
     bonus_credits_1m: 0,
     bonus_credits_3m: 1,
     bonus_credits_6m: 2,
@@ -161,7 +161,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
             description: "The certification you're trying to edit doesn't exist.",
             variant: "destructive",
           })
-          router.push("/admin/certifications")
+          router.push("/certifications-management")
         }
       } catch (error) {
         toast({
@@ -202,7 +202,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
         title: "Certification updated",
         description: `${certification.name} has been updated successfully.`,
       })
-      router.push("/admin/certifications")
+      router.push("/certifications-management")
     } catch (error) {
       toast({
         title: "Failed to update certification",
@@ -336,7 +336,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
     return (
       <div className="container py-10">
         <div className="mb-8">
-          <BackButton href="/admin/certifications" />
+          <BackButton href="/certifications-management" />
         </div>
         <div className="flex items-center justify-center h-64">
           <p className="text-muted-foreground">Loading certification data...</p>
@@ -349,7 +349,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
     return (
       <div className="container py-10">
         <div className="mb-8">
-          <BackButton href="/admin/certifications" />
+          <BackButton href="/certifications-management" />
         </div>
         <div className="flex items-center justify-center h-64">
           <p className="text-muted-foreground">Certification not found</p>
@@ -361,7 +361,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
   return (
     <div className="container py-10">
       <div className="mb-8">
-        <BackButton href="/admin/certifications" />
+        <BackButton href="/certifications-management" />
         <h1 className="mt-6 text-3xl font-bold">Edit Certification</h1>
       </div>
 

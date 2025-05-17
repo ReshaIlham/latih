@@ -340,7 +340,7 @@ export default function UserManagementPage() {
   return (
     <div className="container py-10">
       <div className="mb-8 space-y-4">
-        <h1 className="text-3xl font-bold">User Management</h1>
+        <h1 className="text-3xl font-bold">User Account</h1>
         <p className="text-muted-foreground">Manage user accounts and roles</p>
       </div>
 

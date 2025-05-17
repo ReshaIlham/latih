@@ -1,9 +1,11 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { useState } from "react"
 import { CertificationCard } from "@/components/certification-card"
 import { Button } from "@/components/ui/button"
-import { Users, CreditCard } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Users, CreditCard, Search } from "lucide-react"
 import Link from "next/link"
 import { useAuth } from "@/lib/auth-provider"
 
@@ -82,6 +84,7 @@ const itemVariants = {
 // Update the component to pass expiry dates to certification cards
 export default function CertificationsPage() {
   const { user } = useAuth()
+  const [searchTerm, setSearchTerm] = useState("")
 
   // Mock data for user's purchased certifications
   const userPurchasedCertifications = user ? ["psm"] : []
@@ -93,6 +96,13 @@ export default function CertificationsPage() {
     return subscription?.expiryDate
   }
 
+  // Filter certifications based on search term
+  const filteredCertifications = certifications.filter(
+    (cert) =>
+      cert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cert.description.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
+
   return (
     <motion.div className="container py-10 md:py-16" initial="hidden" animate="visible" variants={containerVariants}>
       <motion.div className="mb-8 text-center" variants={itemVariants}>
@@ -102,28 +112,51 @@ export default function CertificationsPage() {
         </p>
       </motion.div>
 
+      {/* Search bar */}
+      <motion.div className="mb-8 max-w-md mx-auto" variants={itemVariants}>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search certifications..."
+            className="pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </motion.div>
+
       <motion.div className="grid gap-8 md:grid-cols-3" variants={containerVariants}>
-        {certifications.map((cert) => (
-          <motion.div key={cert.id} variants={itemVariants}>
-            <CertificationCard
-              id={cert.id}
-              title={cert.title}
-              image={cert.image}
-              description={cert.description}
-              questionCount={cert.questionCount}
-              domainCount={cert.domainCount}
-              testTypeCount={cert.testTypeCount}
-              isComingSoon={cert.isComingSoon}
-              original_price={cert.original_price}
-              discount_price={cert.discount_price}
-              isPurchased={userPurchasedCertifications.includes(cert.id)}
-              expiryDate={getExpiryDate(cert.id)}
-              isPopular={false}
-              hideExtendButton={true}
-              buttonText="Start for Free Now"
-            />
+        {filteredCertifications.length > 0 ? (
+          filteredCertifications.map((cert) => (
+            <motion.div key={cert.id} variants={itemVariants}>
+              <CertificationCard
+                id={cert.id}
+                title={cert.title}
+                image={cert.image}
+                description={cert.description}
+                questionCount={cert.questionCount}
+                domainCount={cert.domainCount}
+                testTypeCount={cert.testTypeCount}
+                isComingSoon={cert.isComingSoon}
+                original_price={cert.original_price}
+                discount_price={cert.discount_price}
+                isPurchased={userPurchasedCertifications.includes(cert.id)}
+                expiryDate={getExpiryDate(cert.id)}
+                isPopular={false}
+                hideExtendButton={true}
+                buttonText="Start for Free Now"
+              />
+            </motion.div>
+          ))
+        ) : (
+          <motion.div className="col-span-3 text-center py-12" variants={itemVariants}>
+            <h3 className="text-xl font-semibold mb-2">No certifications found</h3>
+            <p className="text-muted-foreground mb-4">
+              Try adjusting your search term or check back later for new certifications.
+            </p>
           </motion.div>
-        ))}
+        )}
       </motion.div>
 
       <motion.div className="mt-16 text-center" variants={itemVariants}>
