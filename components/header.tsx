@@ -28,6 +28,8 @@ import {
   UserCog,
   CreditCardIcon,
   UserCheck,
+  Layers,
+  ChevronDown,
 } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -116,24 +118,31 @@ export default function Header() {
           icon: BookOpen,
         },
         {
-          name: "My Certifications",
-          href: "/my-certifications",
-          icon: LayoutDashboard,
-        },
-        {
-          name: "Browse Certifications",
-          href: "/certifications",
-          icon: BookOpen,
-        },
-        {
-          name: "Subscriptions",
-          href: "/subscription",
-          icon: CreditCard,
-        },
-        {
-          name: "Mentoring Sessions",
-          href: "/mentoring",
-          icon: Users,
+          name: "Learner Features",
+          href: "#",
+          icon: Layers,
+          children: [
+            {
+              name: "My Certifications",
+              href: "/my-certifications",
+              icon: LayoutDashboard,
+            },
+            {
+              name: "Browse Certifications",
+              href: "/certifications",
+              icon: BookOpen,
+            },
+            {
+              name: "Subscriptions",
+              href: "/subscription",
+              icon: CreditCard,
+            },
+            {
+              name: "Mentoring Sessions",
+              href: "/mentoring",
+              icon: Users,
+            },
+          ],
         },
       ]
     }
@@ -215,24 +224,34 @@ export default function Header() {
           icon: BookOpen,
         },
         {
+          name: "Learner Features",
+          href: "#",
+          icon: Layers,
+          isSection: true,
+        },
+        {
           name: "My Certifications",
           href: "/my-certifications",
           icon: LayoutDashboard,
+          indent: true,
         },
         {
           name: "Browse Certifications",
           href: "/certifications",
           icon: BookOpen,
+          indent: true,
         },
         {
           name: "Subscriptions",
           href: "/subscription",
           icon: CreditCard,
+          indent: true,
         },
         {
           name: "Mentoring Sessions",
           href: "/mentoring",
           icon: Users,
+          indent: true,
         },
       ]
     }
@@ -294,7 +313,7 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/95 backdrop-blur-sm shadow-sm" : "bg-background"
+        isScrolled ? "bg-background/95 backdrop-blur-sm shadow-md" : "bg-background shadow-sm"
       }`}
     >
       <div className="container flex h-16 items-center justify-between">
@@ -306,10 +325,38 @@ export default function Header() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-lg font-bold">L</span>
+              <div className="flex items-center">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="mr-1"
+                >
+                  <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#ff3e3e" />
+                      <stop offset="100%" stopColor="#ff7676" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M12 2L4 6V12C4 15.31 7.58 19.81 12 22C16.42 19.81 20 15.31 20 12V6L12 2Z"
+                    fill="url(#logoGradient)"
+                    stroke="none"
+                  />
+                  <path
+                    d="M8.5 12L11 14.5L16 9.5"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                  Latih
+                </span>
               </div>
-              <span className="ml-2 text-xl font-bold text-foreground">Latih</span>
             </motion.div>
           </Link>
 
@@ -322,13 +369,14 @@ export default function Header() {
                   <DropdownMenu key={item.name}>
                     <DropdownMenuTrigger asChild>
                       <button
-                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center ${
                           hasActiveChild(item.children)
                             ? "bg-primary/10 text-primary"
                             : "text-foreground/70 hover:text-foreground hover:bg-accent"
                         }`}
                       >
                         {item.name}
+                        <ChevronDown className="ml-1 h-3.5 w-3.5 opacity-70" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56">
@@ -424,10 +472,38 @@ export default function Header() {
                       <div className="flex flex-col space-y-6 py-6">
                         <div className="flex items-center justify-between">
                           <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                              <span className="text-lg font-bold">L</span>
+                            <div className="flex items-center">
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="mr-1"
+                              >
+                                <defs>
+                                  <linearGradient id="mobileLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#ff3e3e" />
+                                    <stop offset="100%" stopColor="#ff7676" />
+                                  </linearGradient>
+                                </defs>
+                                <path
+                                  d="M12 2L4 6V12C4 15.31 7.58 19.81 12 22C16.42 19.81 20 15.31 20 12V6L12 2Z"
+                                  fill="url(#mobileLogoGradient)"
+                                  stroke="none"
+                                />
+                                <path
+                                  d="M8.5 12L11 14.5L16 9.5"
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              <span className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                                Latih
+                              </span>
                             </div>
-                            <span className="ml-2 text-xl font-bold">Latih</span>
                           </Link>
                         </div>
 
@@ -441,21 +517,39 @@ export default function Header() {
 
                         {/* Mobile Navigation */}
                         <nav className="flex flex-col space-y-1">
-                          {mobileMenuItems.map((item) => (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                isActivePath(item.href)
-                                  ? "bg-primary/10 text-primary"
-                                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
-                              }`}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              <item.icon className="mr-2 h-4 w-4" />
-                              {item.name}
-                            </Link>
-                          ))}
+                          {mobileMenuItems.map((item, index) => {
+                            // Section header
+                            if (item.isSection) {
+                              return (
+                                <div
+                                  key={item.name}
+                                  className="mt-2 mb-1 px-3 py-1 text-sm font-semibold text-foreground"
+                                >
+                                  <div className="flex items-center">
+                                    <item.icon className="mr-2 h-4 w-4" />
+                                    {item.name}
+                                  </div>
+                                </div>
+                              )
+                            }
+
+                            // Regular or indented menu item
+                            return (
+                              <Link
+                                key={item.href + index}
+                                href={item.href}
+                                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                  isActivePath(item.href)
+                                    ? "bg-primary/10 text-primary"
+                                    : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                                } ${item.indent ? "ml-4" : ""}`}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                <item.icon className="mr-2 h-4 w-4" />
+                                {item.name}
+                              </Link>
+                            )
+                          })}
                         </nav>
 
                         <div className="border-t pt-4 space-y-2">
@@ -512,10 +606,38 @@ export default function Header() {
                       <div className="flex flex-col space-y-6 py-6">
                         <div className="flex items-center justify-between">
                           <Link href="/" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                              <span className="text-lg font-bold">L</span>
+                            <div className="flex items-center">
+                              <svg
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="mr-1"
+                              >
+                                <defs>
+                                  <linearGradient id="mobileLogoGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#ff3e3e" />
+                                    <stop offset="100%" stopColor="#ff7676" />
+                                  </linearGradient>
+                                </defs>
+                                <path
+                                  d="M12 2L4 6V12C4 15.31 7.58 19.81 12 22C16.42 19.81 20 15.31 20 12V6L12 2Z"
+                                  fill="url(#mobileLogoGradient2)"
+                                  stroke="none"
+                                />
+                                <path
+                                  d="M8.5 12L11 14.5L16 9.5"
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              <span className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                                Latih
+                              </span>
                             </div>
-                            <span className="ml-2 text-xl font-bold">Latih</span>
                           </Link>
                         </div>
 

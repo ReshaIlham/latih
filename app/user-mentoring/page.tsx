@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Mock mentoring session data
 const mockMentoringSessions = [
@@ -476,350 +477,328 @@ export default function UserMentoringPage() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container pt-10 py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">User Mentoring</h1>
         <p className="text-muted-foreground mt-2">Manage mentoring sessions and credit purchases</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b mb-6">
-        <button
-          className={`px-4 py-2 font-medium ${
-            activeTab === "sessions"
-              ? "border-b-2 border-primary text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          onClick={() => {
-            setActiveTab("sessions")
-            setCurrentPage(1)
-          }}
-        >
-          Mentoring Sessions
-        </button>
-        <button
-          className={`px-4 py-2 font-medium ${
-            activeTab === "credits"
-              ? "border-b-2 border-primary text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-          onClick={() => {
-            setActiveTab("credits")
-            setCurrentPage(1)
-          }}
-        >
-          Credit Purchases
-        </button>
-      </div>
+      <Tabs defaultValue="sessions" value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="sessions">Mentoring Sessions</TabsTrigger>
+          <TabsTrigger value="credits">Credit Purchases</TabsTrigger>
+        </TabsList>
 
-      {/* Filters and Add Button */}
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-1 items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search by name or email..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value)
-                setCurrentPage(1)
-              }}
-            />
+        {/* Filters and Add Button */}
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-1 items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by name or email..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setCurrentPage(1)
+                }}
+              />
+            </div>
+
+            {activeTab === "sessions" && (
+              <>
+                <Select
+                  value={statusFilter}
+                  onValueChange={(value) => {
+                    setStatusFilter(value)
+                    setCurrentPage(1)
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={certificationFilter}
+                  onValueChange={(value) => {
+                    setCertificationFilter(value)
+                    setCurrentPage(1)
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by certification" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Certifications</SelectItem>
+                    <SelectItem value="PSM">PSM</SelectItem>
+                    <SelectItem value="PSPO">PSPO</SelectItem>
+                    <SelectItem value="PMP">PMP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </>
+            )}
+
+            {activeTab === "credits" && (
+              <Select
+                value={creditVerificationFilter}
+                onValueChange={(value) => {
+                  setCreditVerificationFilter(value)
+                  setCurrentPage(1)
+                }}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by verification" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Verification</SelectItem>
+                  <SelectItem value="verified">Verified</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
-          {activeTab === "sessions" && (
-            <>
-              <Select
-                value={statusFilter}
-                onValueChange={(value) => {
-                  setStatusFilter(value)
-                  setCurrentPage(1)
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={certificationFilter}
-                onValueChange={(value) => {
-                  setCertificationFilter(value)
-                  setCurrentPage(1)
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Filter by certification" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Certifications</SelectItem>
-                  <SelectItem value="PSM">PSM</SelectItem>
-                  <SelectItem value="PSPO">PSPO</SelectItem>
-                  <SelectItem value="PMP">PMP</SelectItem>
-                </SelectContent>
-              </Select>
-            </>
-          )}
-
-          {activeTab === "credits" && (
-            <Select
-              value={creditVerificationFilter}
-              onValueChange={(value) => {
-                setCreditVerificationFilter(value)
-                setCurrentPage(1)
-              }}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by verification" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Verification</SelectItem>
-                <SelectItem value="verified">Verified</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-              </SelectContent>
-            </Select>
+          {activeTab === "sessions" ? (
+            <Button onClick={() => setIsAddingSession(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Session
+            </Button>
+          ) : (
+            <Button onClick={() => setIsAddingCredit(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Credit Purchase
+            </Button>
           )}
         </div>
 
-        {activeTab === "sessions" ? (
-          <Button onClick={() => setIsAddingSession(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Session
-          </Button>
-        ) : (
-          <Button onClick={() => setIsAddingCredit(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Credit Purchase
-          </Button>
-        )}
-      </div>
-
-      {/* Sessions Table */}
-      {activeTab === "sessions" && (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Mentor</TableHead>
-                <TableHead>Certification</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Credits Used</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentItems.length > 0 ? (
-                currentItems.map((session) => (
-                  <TableRow key={session.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{session.userName}</div>
-                        <div className="text-sm text-muted-foreground">{session.userEmail}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{session.mentorName}</TableCell>
-                    <TableCell>{session.certification}</TableCell>
-                    <TableCell>
-                      <div>
-                        <div>{formatDate(session.date)}</div>
-                        <div className="text-sm text-muted-foreground">{session.time}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
-                        <span>{session.duration} min</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{session.creditsUsed}</TableCell>
-                    <TableCell>{getStatusBadge(session.status)}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditSession(session)}>
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this mentoring session for {session.userName}? This
-                                action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={() => handleDeleteSession(session.id)}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
+        {/* Sessions Tab Content */}
+        <TabsContent value="sessions" className="space-y-4">
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={8} className="h-24 text-center">
-                    No mentoring sessions found.
-                  </TableCell>
+                  <TableHead>User</TableHead>
+                  <TableHead>Mentor</TableHead>
+                  <TableHead>Certification</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Duration</TableHead>
+                  <TableHead>Credits Used</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              </TableHeader>
+              <TableBody>
+                {currentItems.length > 0 ? (
+                  currentItems.map((session) => (
+                    <TableRow key={session.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{session.userName}</div>
+                          <div className="text-sm text-muted-foreground">{session.userEmail}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{session.mentorName}</TableCell>
+                      <TableCell>{session.certification}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div>{formatDate(session.date)}</div>
+                          <div className="text-sm text-muted-foreground">{session.time}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <Clock className="mr-1 h-4 w-4 text-muted-foreground" />
+                          <span>{session.duration} min</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{session.creditsUsed}</TableCell>
+                      <TableCell>{getStatusBadge(session.status)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEditSession(session)}>
+                            <Edit className="h-4 w-4" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
 
-      {/* Credits Table */}
-      {activeTab === "credits" && (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Credits Purchased</TableHead>
-                <TableHead>Purchase Date</TableHead>
-                <TableHead>Amount Paid</TableHead>
-                <TableHead>Verification</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {currentItems.length > 0 ? (
-                currentItems.map((purchase) => (
-                  <TableRow key={purchase.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{purchase.userName}</div>
-                        <div className="text-sm text-muted-foreground">{purchase.userEmail}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{purchase.amount} credits</TableCell>
-                    <TableCell>{formatDate(purchase.date)}</TableCell>
-                    <TableCell>{formatCurrency(purchase.price)}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={purchase.verificationStatus === "verified" ? "default" : "outline"}
-                        className={purchase.verificationStatus === "verified" ? "bg-blue-500" : ""}
-                      >
-                        {purchase.verificationStatus === "verified" ? "Verified" : "Pending"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleEditCreditPurchase(purchase)}>
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-
-                        {purchase.verificationStatus === "pending" && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="ghost" size="icon">
-                                <CheckCircle className="h-4 w-4 text-blue-500" />
-                                <span className="sr-only">Verify</span>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                                <span className="sr-only">Delete</span>
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Confirm Verification</AlertDialogTitle>
+                                <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Are you sure you want to verify this credit purchase for {purchase.userName}?
+                                  Are you sure you want to delete this mentoring session for {session.userName}? This
+                                  action cannot be undone.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
-                                  className="bg-blue-500 text-white hover:bg-blue-600"
-                                  onClick={() => {
-                                    setIsLoading(true)
-                                    // Simulate API call
-                                    setTimeout(() => {
-                                      setCreditPurchases(
-                                        creditPurchases.map((credit) =>
-                                          credit.id === purchase.id
-                                            ? { ...credit, verificationStatus: "verified" }
-                                            : credit,
-                                        ),
-                                      )
-                                      setIsLoading(false)
-                                      toast({
-                                        title: "Credit purchase verified",
-                                        description: "The credit purchase has been verified successfully.",
-                                      })
-                                    }, 500)
-                                  }}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  onClick={() => handleDeleteSession(session.id)}
                                 >
-                                  Verify
+                                  Delete
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-                        )}
-
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this credit purchase for {purchase.userName}? This
-                                action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                onClick={() => handleDeleteCreditPurchase(purchase.id)}
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-24 text-center">
+                      No mentoring sessions found.
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+
+        {/* Credits Tab Content */}
+        <TabsContent value="credits" className="space-y-4">
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    No credit purchases found.
-                  </TableCell>
+                  <TableHead>User</TableHead>
+                  <TableHead>Credits Purchased</TableHead>
+                  <TableHead>Purchase Date</TableHead>
+                  <TableHead>Amount Paid</TableHead>
+                  <TableHead>Verification</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              </TableHeader>
+              <TableBody>
+                {currentItems.length > 0 ? (
+                  currentItems.map((purchase) => (
+                    <TableRow key={purchase.id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{purchase.userName}</div>
+                          <div className="text-sm text-muted-foreground">{purchase.userEmail}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>{purchase.amount} credits</TableCell>
+                      <TableCell>{formatDate(purchase.date)}</TableCell>
+                      <TableCell>{formatCurrency(purchase.price)}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={purchase.verificationStatus === "verified" ? "default" : "outline"}
+                          className={purchase.verificationStatus === "verified" ? "bg-blue-500" : ""}
+                        >
+                          {purchase.verificationStatus === "verified" ? "Verified" : "Pending"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => handleEditCreditPurchase(purchase)}>
+                            <Edit className="h-4 w-4" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+
+                          {purchase.verificationStatus === "pending" && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <CheckCircle className="h-4 w-4 text-blue-500" />
+                                  <span className="sr-only">Verify</span>
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Confirm Verification</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to verify this credit purchase for {purchase.userName}?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-blue-500 text-white hover:bg-blue-600"
+                                    onClick={() => {
+                                      setIsLoading(true)
+                                      // Simulate API call
+                                      setTimeout(() => {
+                                        setCreditPurchases(
+                                          creditPurchases.map((credit) =>
+                                            credit.id === purchase.id
+                                              ? { ...credit, verificationStatus: "verified" }
+                                              : credit,
+                                          ),
+                                        )
+                                        setIsLoading(false)
+                                        toast({
+                                          title: "Credit purchase verified",
+                                          description: "The credit purchase has been verified successfully.",
+                                        })
+                                      }, 500)
+                                    }}
+                                  >
+                                    Verify
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                                <span className="sr-only">Delete</span>
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this credit purchase for {purchase.userName}? This
+                                  action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  onClick={() => handleDeleteCreditPurchase(purchase.id)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No credit purchases found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Pagination */}
       {filteredData.length > 0 && (
