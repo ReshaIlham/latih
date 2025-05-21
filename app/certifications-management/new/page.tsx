@@ -28,6 +28,7 @@ type TestType = {
   timeLimit: number
   questionCount: number
   passingGrade: number
+  isPremium?: boolean
 }
 
 export default function NewCertificationPage() {
@@ -75,6 +76,7 @@ export default function NewCertificationPage() {
     timeLimit: 30,
     questionCount: 0,
     passingGrade: 70,
+    isPremium: false,
   })
   const [activeTab, setActiveTab] = useState("basic")
 
@@ -198,6 +200,7 @@ export default function NewCertificationPage() {
           timeLimit: newTestType.timeLimit,
           questionCount: newTestType.questionCount,
           passingGrade: newTestType.passingGrade,
+          isPremium: newTestType.isPremium,
         },
       ],
     })
@@ -207,6 +210,7 @@ export default function NewCertificationPage() {
       timeLimit: 30,
       questionCount: 0,
       passingGrade: 70,
+      isPremium: false,
     })
   }
 
@@ -663,6 +667,21 @@ export default function NewCertificationPage() {
                           />
                         </div>
                       </div>
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Checkbox
+                          id="test-premium"
+                          checked={newTestType.isPremium || false}
+                          onCheckedChange={(checked) =>
+                            setNewTestType({ ...newTestType, isPremium: checked as boolean })
+                          }
+                        />
+                        <label
+                          htmlFor="test-premium"
+                          className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Premium Test Type (requires subscription)
+                        </label>
+                      </div>
                       <Button type="button" onClick={handleAddTestType}>
                         <Plus className="h-4 w-4 mr-2" />
                         Add Test Type
@@ -684,6 +703,7 @@ export default function NewCertificationPage() {
                                 <p className="text-sm text-muted-foreground">
                                   {test.questionCount} questions | {test.timeLimit} minutes | {test.passingGrade}% to
                                   pass
+                                  {test.isPremium && " | Premium"}
                                 </p>
                               </div>
                               <Button
@@ -788,6 +808,7 @@ export default function NewCertificationPage() {
                     {newCertification.testTypes.map((test) => (
                       <li key={test.id}>
                         {test.name} ({test.questionCount} questions, {test.timeLimit} min, {test.passingGrade}% to pass)
+                        {test.isPremium && " - Premium"}
                       </li>
                     ))}
                   </ul>

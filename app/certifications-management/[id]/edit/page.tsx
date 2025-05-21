@@ -29,6 +29,7 @@ type TestType = {
   timeLimit: number
   questionCount: number
   passingGrade: number
+  isPremium?: boolean
 }
 
 type Certification = {
@@ -75,9 +76,9 @@ const mockCertifications = {
       { id: "d3", name: "Events" },
     ],
     testTypes: [
-      { id: "t1", name: "Short Test", timeLimit: 30, questionCount: 40, passingGrade: 70 },
-      { id: "t2", name: "Medium Test", timeLimit: 60, questionCount: 80, passingGrade: 75 },
-      { id: "t3", name: "Full Test", timeLimit: 120, questionCount: 120, passingGrade: 80 },
+      { id: "t1", name: "Short Test", timeLimit: 30, questionCount: 40, passingGrade: 70, isPremium: false },
+      { id: "t2", name: "Medium Test", timeLimit: 60, questionCount: 80, passingGrade: 75, isPremium: false },
+      { id: "t3", name: "Full Test", timeLimit: 120, questionCount: 120, passingGrade: 80, isPremium: true },
     ],
     original_price: 199000,
     certification_discount: 25000,
@@ -107,9 +108,9 @@ const mockCertifications = {
       { id: "d6", name: "Events" },
     ],
     testTypes: [
-      { id: "t4", name: "Short Test", timeLimit: 30, questionCount: 30, passingGrade: 70 },
-      { id: "t5", name: "Medium Test", timeLimit: 60, questionCount: 60, passingGrade: 75 },
-      { id: "t6", name: "Full Test", timeLimit: 90, questionCount: 90, passingGrade: 80 },
+      { id: "t4", name: "Short Test", timeLimit: 30, questionCount: 30, passingGrade: 70, isPremium: false },
+      { id: "t5", name: "Medium Test", timeLimit: 60, questionCount: 60, passingGrade: 75, isPremium: false },
+      { id: "t6", name: "Full Test", timeLimit: 90, questionCount: 90, passingGrade: 80, isPremium: false },
     ],
     original_price: 199000,
     certification_discount: 0,
@@ -134,6 +135,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
     timeLimit: 30,
     questionCount: 0,
     passingGrade: 70,
+    isPremium: false,
   })
   const [activeTab, setActiveTab] = useState("basic")
 
@@ -285,6 +287,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
           timeLimit: newTestType.timeLimit,
           questionCount: newTestType.questionCount,
           passingGrade: newTestType.passingGrade,
+          isPremium: newTestType.isPremium,
         },
       ],
     })
@@ -294,6 +297,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
       timeLimit: 30,
       questionCount: 0,
       passingGrade: 70,
+      isPremium: false,
     })
   }
 
@@ -805,6 +809,21 @@ export default function EditCertificationPage({ params }: { params: { id: string
                           />
                         </div>
                       </div>
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Checkbox
+                          id="test-premium"
+                          checked={newTestType.isPremium || false}
+                          onCheckedChange={(checked) =>
+                            setNewTestType({ ...newTestType, isPremium: checked as boolean })
+                          }
+                        />
+                        <label
+                          htmlFor="test-premium"
+                          className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Premium Test Type (requires subscription)
+                        </label>
+                      </div>
                       <Button type="button" onClick={handleAddTestType}>
                         <Plus className="h-4 w-4 mr-2" />
                         Add Test Type
@@ -826,6 +845,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
                                 <p className="text-sm text-muted-foreground">
                                   {test.questionCount} questions | {test.timeLimit} minutes | {test.passingGrade}% to
                                   pass
+                                  {test.isPremium && " | Premium"}
                                 </p>
                               </div>
                               <Button
@@ -925,6 +945,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
                     {certification.testTypes.map((test) => (
                       <li key={test.id}>
                         {test.name} ({test.questionCount} questions, {test.timeLimit} min, {test.passingGrade}% to pass)
+                        {test.isPremium && " - Premium"}
                       </li>
                     ))}
                   </ul>

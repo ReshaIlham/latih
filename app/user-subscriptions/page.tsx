@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
@@ -26,7 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Label } from "@/components/ui/label"
-import { Search, ChevronLeft, ChevronRight, Edit, Trash2, Plus, CheckCircle } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, Edit, Trash2, Plus, CheckCircle, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -231,16 +231,16 @@ const mockSubscriptions = [
 
 // Mock users for dropdown
 const mockUsers = [
-  { id: "user-1", name: "John Doe" },
-  { id: "user-2", name: "Jane Smith" },
-  { id: "user-4", name: "Emily Davis" },
-  { id: "user-5", name: "Michael Wilson" },
-  { id: "user-7", name: "David Miller" },
-  { id: "user-8", name: "Lisa Anderson" },
-  { id: "user-9", name: "Thomas Wright" },
-  { id: "user-10", name: "Jessica Lee" },
-  { id: "user-11", name: "Kevin Chen" },
-  { id: "user-12", name: "Amanda Taylor" },
+  { id: "user-1", name: "John Doe", email: "john@example.com" },
+  { id: "user-2", name: "Jane Smith", email: "jane@example.com" },
+  { id: "user-4", name: "Emily Davis", email: "emily@example.com" },
+  { id: "user-5", name: "Michael Wilson", email: "michael@example.com" },
+  { id: "user-7", name: "David Miller", email: "david@example.com" },
+  { id: "user-8", name: "Lisa Anderson", email: "lisa@example.com" },
+  { id: "user-9", name: "Thomas Wright", email: "thomas@example.com" },
+  { id: "user-10", name: "Jessica Lee", email: "jessica@example.com" },
+  { id: "user-11", name: "Kevin Chen", email: "kevin@example.com" },
+  { id: "user-12", name: "Amanda Taylor", email: "amanda@example.com" },
 ]
 
 // Mock certifications for dropdown
@@ -254,6 +254,7 @@ const mockCertifications = [
 const initialNewSubscription = {
   userId: "",
   userName: "",
+  userEmail: "",
   certification: "",
   numberOfMonths: 1,
   startDate: new Date().toISOString().split("T")[0],
@@ -275,6 +276,54 @@ export default function UserSubscriptionsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const [verificationFilter, setVerificationFilter] = useState("all")
+
+  // User search states
+  const [userSearchTerm, setUserSearchTerm] = useState("")
+  const [editUserSearchTerm, setEditUserSearchTerm] = useState("")
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const [showEditUserDropdown, setShowEditUserDropdown] = useState(false)
+  const [filteredUsers, setFilteredUsers] = useState(mockUsers)
+  const [filteredEditUsers, setFilteredEditUsers] = useState(mockUsers)
+
+  const userSearchRef = useRef(null)
+  const editUserSearchRef = useRef(null)
+
+  // Filter users based on search term
+  useEffect(() => {
+    const filtered = mockUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(userSearchTerm.toLowerCase()),
+    )
+    setFilteredUsers(filtered)
+  }, [userSearchTerm])
+
+  // Filter users for edit modal based on search term
+  useEffect(() => {
+    const filtered = mockUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(editUserSearchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(editUserSearchTerm.toLowerCase()),
+    )
+    setFilteredEditUsers(filtered)
+  }, [editUserSearchTerm])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (userSearchRef.current && !userSearchRef.current.contains(event.target)) {
+        setShowUserDropdown(false)
+      }
+      if (editUserSearchRef.current && !editUserSearchRef.current.contains(event.target)) {
+        setShowEditUserDropdown(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   // Apply filters
   const filteredSubscriptions = subscriptions.filter((sub) => {
@@ -322,13 +371,27 @@ export default function UserSubscriptionsPage() {
   }
 
   // Handle user selection
-  const handleUserChange = (userId) => {
-    const selectedUser = mockUsers.find((user) => user.id === userId)
+  const handleUserChange = (user) => {
     setNewSubscription({
       ...newSubscription,
-      userId,
-      userName: selectedUser ? selectedUser.name : "",
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
     })
+    setShowUserDropdown(false)
+    setUserSearchTerm("")
+  }
+
+  // Handle user selection for editing
+  const handleEditUserChange = (user) => {
+    setEditingSubscription({
+      ...editingSubscription,
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+    })
+    setShowEditUserDropdown(false)
+    setEditUserSearchTerm("")
   }
 
   // Handle certification selection
@@ -368,8 +431,6 @@ export default function UserSubscriptionsPage() {
       const newSub = {
         id: `sub-${Date.now()}`,
         ...newSubscription,
-        userEmail: `${newSubscription.userName.toLowerCase().replace(" ", ".")}@example.com`,
-        status: "active",
       }
 
       setSubscriptions([newSub, ...subscriptions])
@@ -422,6 +483,26 @@ export default function UserSubscriptionsPage() {
         description: "The subscription has been deleted successfully.",
       })
     }, 1000)
+  }
+
+  // Clear user selection
+  const clearUserSelection = () => {
+    setNewSubscription({
+      ...newSubscription,
+      userId: "",
+      userName: "",
+      userEmail: "",
+    })
+  }
+
+  // Clear edit user selection
+  const clearEditUserSelection = () => {
+    setEditingSubscription({
+      ...editingSubscription,
+      userId: "",
+      userName: "",
+      userEmail: "",
+    })
   }
 
   return (
@@ -488,7 +569,7 @@ export default function UserSubscriptionsPage() {
               Add Subscription
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px]" autoFocus={false}>
             <DialogHeader>
               <DialogTitle>Add New Subscription</DialogTitle>
               <DialogDescription>Create a new subscription for a user.</DialogDescription>
@@ -496,18 +577,55 @@ export default function UserSubscriptionsPage() {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="user">User Name</Label>
-                <Select value={newSubscription.userId} onValueChange={handleUserChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a user" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mockUsers.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="relative" ref={userSearchRef}>
+                  <div className="flex">
+                    {newSubscription.userName ? (
+                      <div className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <div>
+                          <div>{newSubscription.userName}</div>
+                          <div className="text-xs text-muted-foreground">{newSubscription.userEmail}</div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="h-auto p-0" onClick={clearUserSelection}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative w-full">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          className="pl-8"
+                          value={userSearchTerm}
+                          onChange={(e) => {
+                            setUserSearchTerm(e.target.value)
+                            setShowUserDropdown(true)
+                          }}
+                          onFocus={() => setShowUserDropdown(true)}
+                          autoFocus={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {showUserDropdown && !newSubscription.userName && (
+                    <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover shadow-md">
+                      {filteredUsers.length > 0 ? (
+                        filteredUsers.map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex cursor-pointer flex-col px-3 py-2 hover:bg-accent"
+                            onClick={() => handleUserChange(user)}
+                          >
+                            <div>{user.name}</div>
+                            <div className="text-xs text-muted-foreground">{user.email}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-muted-foreground">No users found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid gap-2">
@@ -557,6 +675,7 @@ export default function UserSubscriptionsPage() {
                     })
                   }
                   placeholder="Enter amount in IDR"
+                  autoFocus={false}
                 />
               </div>
 
@@ -567,12 +686,13 @@ export default function UserSubscriptionsPage() {
                   type="date"
                   value={newSubscription.startDate}
                   onChange={(e) => handleStartDateChange(e.target.value)}
+                  autoFocus={false}
                 />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="endDate">End Date</Label>
-                <Input id="endDate" type="date" value={newSubscription.endDate} disabled />
+                <Input id="endDate" type="date" value={newSubscription.endDate} disabled autoFocus={false} />
                 <p className="text-xs text-muted-foreground">
                   End date is calculated automatically based on start date and duration
                 </p>
@@ -807,12 +927,65 @@ export default function UserSubscriptionsPage() {
       {/* Edit Subscription Dialog */}
       {editingSubscription && (
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px]" autoFocus={false}>
             <DialogHeader>
               <DialogTitle>Edit Subscription</DialogTitle>
               <DialogDescription>Update subscription details for {editingSubscription.userName}.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-user">User Name</Label>
+                <div className="relative" ref={editUserSearchRef}>
+                  <div className="flex">
+                    {editingSubscription.userName ? (
+                      <div className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <div>
+                          <div>{editingSubscription.userName}</div>
+                          <div className="text-xs text-muted-foreground">{editingSubscription.userEmail}</div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="h-auto p-0" onClick={clearEditUserSelection}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative w-full">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          className="pl-8"
+                          value={editUserSearchTerm}
+                          onChange={(e) => {
+                            setEditUserSearchTerm(e.target.value)
+                            setShowEditUserDropdown(true)
+                          }}
+                          onFocus={() => setShowEditUserDropdown(true)}
+                          autoFocus={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {showEditUserDropdown && !editingSubscription.userName && (
+                    <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover shadow-md">
+                      {filteredEditUsers.length > 0 ? (
+                        filteredEditUsers.map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex cursor-pointer flex-col px-3 py-2 hover:bg-accent"
+                            onClick={() => handleEditUserChange(user)}
+                          >
+                            <div>{user.name}</div>
+                            <div className="text-xs text-muted-foreground">{user.email}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-muted-foreground">No users found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="edit-certification">Certification</Label>
                 <Select
@@ -879,6 +1052,7 @@ export default function UserSubscriptionsPage() {
                     })
                   }
                   placeholder="Enter amount in IDR"
+                  autoFocus={false}
                 />
               </div>
 
@@ -900,12 +1074,13 @@ export default function UserSubscriptionsPage() {
                       endDate: endDate.toISOString().split("T")[0],
                     })
                   }}
+                  autoFocus={false}
                 />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="edit-endDate">End Date</Label>
-                <Input id="edit-endDate" type="date" value={editingSubscription.endDate} disabled />
+                <Input id="edit-endDate" type="date" value={editingSubscription.endDate} disabled autoFocus={false} />
                 <p className="text-xs text-muted-foreground">
                   End date is calculated automatically based on start date and duration
                 </p>

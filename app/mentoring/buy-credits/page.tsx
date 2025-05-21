@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -78,6 +78,15 @@ export default function BuyCreditsPage() {
   const [paymentProof, setPaymentProof] = useState<File | null>(null)
   const [notes, setNotes] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Pre-fill user data when available
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "")
+      setEmail(user.email || "")
+      setPhone(user.phone || "")
+    }
+  }, [user])
 
   // Get selected package data
   const selectedPackage = creditPackages.find((pkg) => pkg.id === selectedPackageId) || creditPackages[1]
@@ -600,9 +609,10 @@ export default function BuyCreditsPage() {
                     <Input
                       id="name"
                       placeholder="Enter your full name"
-                      value={name}
+                      value={user?.name || name}
                       onChange={(e) => setName(e.target.value)}
-                      required
+                      disabled
+                      className="bg-muted/50"
                     />
                   </div>
 
@@ -612,9 +622,10 @@ export default function BuyCreditsPage() {
                       id="email"
                       type="email"
                       placeholder="Enter your email address"
-                      value={email}
+                      value={user?.email || email}
                       onChange={(e) => setEmail(e.target.value)}
-                      required
+                      disabled
+                      className="bg-muted/50"
                     />
                   </div>
 
@@ -623,9 +634,10 @@ export default function BuyCreditsPage() {
                     <Input
                       id="phone"
                       placeholder="Enter your phone number"
-                      value={phone}
+                      value={user?.phone || phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      required
+                      disabled
+                      className="bg-muted/50"
                     />
                   </div>
 

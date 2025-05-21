@@ -1,5 +1,6 @@
 "use client"
 
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -12,7 +13,6 @@ import { motion } from "framer-motion"
 export default function Home() {
   const { user } = useAuth()
   const [isLoaded, setIsLoaded] = useState(false)
-
   // Set isLoaded to true after component mounts to trigger animations
   useEffect(() => {
     setIsLoaded(true)

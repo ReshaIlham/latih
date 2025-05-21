@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, ChevronLeft, ChevronRight, Clock, Edit, Trash2, Plus, CheckCircle } from "lucide-react"
+import { Search, ChevronLeft, ChevronRight, Clock, Edit, Trash2, Plus, CheckCircle, Link2, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
 import {
@@ -47,6 +47,7 @@ const mockMentoringSessions = [
     status: "scheduled",
     creditsUsed: 2,
     notes: "Discuss Scrum Master certification preparation",
+    link: "https://meet.google.com/abc-defg-hij",
   },
   {
     id: "session-2",
@@ -61,6 +62,7 @@ const mockMentoringSessions = [
     status: "scheduled",
     creditsUsed: 3,
     notes: "Review Product Owner responsibilities",
+    link: "https://zoom.us/j/1234567890",
   },
   {
     id: "session-3",
@@ -75,6 +77,7 @@ const mockMentoringSessions = [
     status: "completed",
     creditsUsed: 2,
     notes: "Mock exam review",
+    link: "",
   },
   {
     id: "session-4",
@@ -89,6 +92,7 @@ const mockMentoringSessions = [
     status: "completed",
     creditsUsed: 4,
     notes: "Project management framework discussion",
+    link: "",
   },
   {
     id: "session-5",
@@ -103,6 +107,7 @@ const mockMentoringSessions = [
     status: "cancelled",
     creditsUsed: 0,
     notes: "Cancelled due to scheduling conflict",
+    link: "",
   },
   {
     id: "session-6",
@@ -117,6 +122,7 @@ const mockMentoringSessions = [
     status: "scheduled",
     creditsUsed: 3,
     notes: "Agile principles and practices",
+    link: "",
   },
   {
     id: "session-7",
@@ -131,6 +137,7 @@ const mockMentoringSessions = [
     status: "scheduled",
     creditsUsed: 4,
     notes: "PMP exam preparation",
+    link: "",
   },
   {
     id: "session-8",
@@ -145,6 +152,7 @@ const mockMentoringSessions = [
     status: "scheduled",
     creditsUsed: 2,
     notes: "Product backlog management",
+    link: "",
   },
 ]
 
@@ -187,14 +195,14 @@ const mockCreditPurchases = [
 
 // Mock users for dropdown
 const mockUsers = [
-  { id: "user-1", name: "John Doe" },
-  { id: "user-2", name: "Jane Smith" },
-  { id: "user-4", name: "Emily Davis" },
-  { id: "user-5", name: "Michael Wilson" },
-  { id: "user-7", name: "David Miller" },
-  { id: "user-8", name: "Lisa Anderson" },
-  { id: "user-9", name: "Thomas Wright" },
-  { id: "user-10", name: "Jessica Lee" },
+  { id: "user-1", name: "John Doe", email: "john@example.com" },
+  { id: "user-2", name: "Jane Smith", email: "jane@example.com" },
+  { id: "user-4", name: "Emily Davis", email: "emily@example.com" },
+  { id: "user-5", name: "Michael Wilson", email: "michael@example.com" },
+  { id: "user-7", name: "David Miller", email: "david@example.com" },
+  { id: "user-8", name: "Lisa Anderson", email: "lisa@example.com" },
+  { id: "user-9", name: "Thomas Wright", email: "thomas@example.com" },
+  { id: "user-10", name: "Jessica Lee", email: "jessica@example.com" },
 ]
 
 // Mock mentors for dropdown
@@ -223,6 +231,7 @@ const initialNewSession = {
   status: "scheduled",
   creditsUsed: 2,
   notes: "",
+  link: "",
 }
 
 // Initial state for new credit purchase
@@ -260,6 +269,93 @@ export default function UserMentoringPage() {
 
   // Add creditVerificationFilter state
   const [creditVerificationFilter, setCreditVerificationFilter] = useState("all")
+
+  // User search states for session
+  const [sessionUserSearchTerm, setSessionUserSearchTerm] = useState("")
+  const [showSessionUserDropdown, setShowSessionUserDropdown] = useState(false)
+  const [filteredSessionUsers, setFilteredSessionUsers] = useState(mockUsers)
+  const sessionUserSearchRef = useRef(null)
+
+  // User search states for edit session
+  const [editSessionUserSearchTerm, setEditSessionUserSearchTerm] = useState("")
+  const [showEditSessionUserDropdown, setShowEditSessionUserDropdown] = useState(false)
+  const [filteredEditSessionUsers, setFilteredEditSessionUsers] = useState(mockUsers)
+  const editSessionUserSearchRef = useRef(null)
+
+  // User search states for credit
+  const [creditUserSearchTerm, setCreditUserSearchTerm] = useState("")
+  const [showCreditUserDropdown, setShowCreditUserDropdown] = useState(false)
+  const [filteredCreditUsers, setFilteredCreditUsers] = useState(mockUsers)
+  const creditUserSearchRef = useRef(null)
+
+  // User search states for edit credit
+  const [editCreditUserSearchTerm, setEditCreditUserSearchTerm] = useState("")
+  const [showEditCreditUserDropdown, setShowEditCreditUserDropdown] = useState(false)
+  const [filteredEditCreditUsers, setFilteredEditCreditUsers] = useState(mockUsers)
+  const editCreditUserSearchRef = useRef(null)
+
+  // Filter users for session based on search term
+  useEffect(() => {
+    const filtered = mockUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(sessionUserSearchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(sessionUserSearchTerm.toLowerCase()),
+    )
+    setFilteredSessionUsers(filtered)
+  }, [sessionUserSearchTerm])
+
+  // Filter users for edit session based on search term
+  useEffect(() => {
+    const filtered = mockUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(editSessionUserSearchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(editSessionUserSearchTerm.toLowerCase()),
+    )
+    setFilteredEditSessionUsers(filtered)
+  }, [editSessionUserSearchTerm])
+
+  // Filter users for credit based on search term
+  useEffect(() => {
+    const filtered = mockUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(creditUserSearchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(creditUserSearchTerm.toLowerCase()),
+    )
+    setFilteredCreditUsers(filtered)
+  }, [creditUserSearchTerm])
+
+  // Filter users for edit credit based on search term
+  useEffect(() => {
+    const filtered = mockUsers.filter(
+      (user) =>
+        user.name.toLowerCase().includes(editCreditUserSearchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(editCreditUserSearchTerm.toLowerCase()),
+    )
+    setFilteredEditCreditUsers(filtered)
+  }, [editCreditUserSearchTerm])
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sessionUserSearchRef.current && !sessionUserSearchRef.current.contains(event.target)) {
+        setShowSessionUserDropdown(false)
+      }
+      if (editSessionUserSearchRef.current && !editSessionUserSearchRef.current.contains(event.target)) {
+        setShowEditSessionUserDropdown(false)
+      }
+      if (creditUserSearchRef.current && !creditUserSearchRef.current.contains(event.target)) {
+        setShowCreditUserDropdown(false)
+      }
+      if (editCreditUserSearchRef.current && !editCreditUserSearchRef.current.contains(event.target)) {
+        setShowEditCreditUserDropdown(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   // Apply filters for sessions
   const filteredSessions = sessions.filter((session) => {
@@ -329,24 +425,87 @@ export default function UserMentoringPage() {
   }
 
   // Handle user selection for session
-  const handleUserChangeForSession = (userId) => {
-    const selectedUser = mockUsers.find((user) => user.id === userId)
+  const handleUserChangeForSession = (user) => {
     setNewSession({
       ...newSession,
-      userId,
-      userName: selectedUser ? selectedUser.name : "",
-      userEmail: selectedUser ? `${selectedUser.name.toLowerCase().replace(" ", ".")}@example.com` : "",
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
     })
+    setShowSessionUserDropdown(false)
+    setSessionUserSearchTerm("")
+  }
+
+  // Handle user selection for editing session
+  const handleEditUserChangeForSession = (user) => {
+    setCurrentSession({
+      ...currentSession,
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+    })
+    setShowEditSessionUserDropdown(false)
+    setEditSessionUserSearchTerm("")
   }
 
   // Handle user selection for credit purchase
-  const handleUserChangeForCredit = (userId) => {
-    const selectedUser = mockUsers.find((user) => user.id === userId)
+  const handleUserChangeForCredit = (user) => {
     setNewCredit({
       ...newCredit,
-      userId,
-      userName: selectedUser ? selectedUser.name : "",
-      userEmail: selectedUser ? `${selectedUser.name.toLowerCase().replace(" ", ".")}@example.com` : "",
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+    })
+    setShowCreditUserDropdown(false)
+    setCreditUserSearchTerm("")
+  }
+
+  // Handle user selection for editing credit
+  const handleEditUserChangeForCredit = (user) => {
+    setCurrentCredit({
+      ...currentCredit,
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+    })
+    setShowEditCreditUserDropdown(false)
+    setEditCreditUserSearchTerm("")
+  }
+
+  // Clear user selections
+  const clearSessionUserSelection = () => {
+    setNewSession({
+      ...newSession,
+      userId: "",
+      userName: "",
+      userEmail: "",
+    })
+  }
+
+  const clearEditSessionUserSelection = () => {
+    setCurrentSession({
+      ...currentSession,
+      userId: "",
+      userName: "",
+      userEmail: "",
+    })
+  }
+
+  const clearCreditUserSelection = () => {
+    setNewCredit({
+      ...newCredit,
+      userId: "",
+      userName: "",
+      userEmail: "",
+    })
+  }
+
+  const clearEditCreditUserSelection = () => {
+    setCurrentCredit({
+      ...currentCredit,
+      userId: "",
+      userName: "",
+      userEmail: "",
     })
   }
 
@@ -611,6 +770,17 @@ export default function UserMentoringPage() {
                         <div>
                           <div>{formatDate(session.date)}</div>
                           <div className="text-sm text-muted-foreground">{session.time}</div>
+                          {session.link && (
+                            <a
+                              href={session.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-500 hover:underline flex items-center gap-1"
+                            >
+                              <Link2 className="h-3 w-3" />
+                              Meeting Link
+                            </a>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -867,7 +1037,7 @@ export default function UserMentoringPage() {
 
       {/* Add Session Dialog */}
       <Dialog open={isAddingSession} onOpenChange={setIsAddingSession}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" autoFocus={false}>
           <DialogHeader>
             <DialogTitle>Add New Mentoring Session</DialogTitle>
             <DialogDescription>Create a new mentoring session for a user.</DialogDescription>
@@ -875,18 +1045,55 @@ export default function UserMentoringPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="user">User</Label>
-              <Select value={newSession.userId} onValueChange={handleUserChangeForSession}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a user" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockUsers.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative" ref={sessionUserSearchRef}>
+                <div className="flex">
+                  {newSession.userName ? (
+                    <div className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <div>
+                        <div>{newSession.userName}</div>
+                        <div className="text-xs text-muted-foreground">{newSession.userEmail}</div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="h-auto p-0" onClick={clearSessionUserSelection}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="relative w-full">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search users..."
+                        className="pl-8"
+                        value={sessionUserSearchTerm}
+                        onChange={(e) => {
+                          setSessionUserSearchTerm(e.target.value)
+                          setShowSessionUserDropdown(true)
+                        }}
+                        onFocus={() => setShowSessionUserDropdown(true)}
+                        autoFocus={false}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {showSessionUserDropdown && !newSession.userName && (
+                  <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover shadow-md">
+                    {filteredSessionUsers.length > 0 ? (
+                      filteredSessionUsers.map((user) => (
+                        <div
+                          key={user.id}
+                          className="flex cursor-pointer flex-col px-3 py-2 hover:bg-accent"
+                          onClick={() => handleUserChangeForSession(user)}
+                        >
+                          <div>{user.name}</div>
+                          <div className="text-xs text-muted-foreground">{user.email}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-muted-foreground">No users found</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid gap-2">
@@ -935,6 +1142,7 @@ export default function UserMentoringPage() {
                   type="date"
                   value={newSession.date}
                   onChange={(e) => setNewSession({ ...newSession, date: e.target.value })}
+                  autoFocus={false}
                 />
               </div>
               <div className="grid gap-2">
@@ -944,8 +1152,24 @@ export default function UserMentoringPage() {
                   type="time"
                   value={newSession.time}
                   onChange={(e) => setNewSession({ ...newSession, time: e.target.value })}
+                  autoFocus={false}
                 />
               </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="link">Meeting Link (optional)</Label>
+              <Input
+                id="link"
+                type="url"
+                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                value={newSession.link}
+                onChange={(e) => setNewSession({ ...newSession, link: e.target.value })}
+                autoFocus={false}
+              />
+              <p className="text-xs text-muted-foreground">
+                Add a link to the virtual meeting room (Zoom, Google Meet, etc.)
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -974,6 +1198,7 @@ export default function UserMentoringPage() {
                   min="1"
                   value={newSession.creditsUsed}
                   onChange={(e) => setNewSession({ ...newSession, creditsUsed: Number.parseInt(e.target.value) || 0 })}
+                  autoFocus={false}
                 />
               </div>
             </div>
@@ -1003,6 +1228,7 @@ export default function UserMentoringPage() {
                 value={newSession.notes}
                 onChange={(e) => setNewSession({ ...newSession, notes: e.target.value })}
                 rows={3}
+                autoFocus={false}
               />
             </div>
           </div>
@@ -1030,12 +1256,70 @@ export default function UserMentoringPage() {
       {/* Edit Session Dialog */}
       {currentSession && (
         <Dialog open={isEditingSession} onOpenChange={setIsEditingSession}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto" autoFocus={false}>
             <DialogHeader>
               <DialogTitle>Edit Mentoring Session</DialogTitle>
               <DialogDescription>Update session details for {currentSession.userName}.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-user">User</Label>
+                <div className="relative" ref={editSessionUserSearchRef}>
+                  <div className="flex">
+                    {currentSession.userName ? (
+                      <div className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <div>
+                          <div>{currentSession.userName}</div>
+                          <div className="text-xs text-muted-foreground">{currentSession.userEmail}</div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto p-0"
+                          onClick={clearEditSessionUserSelection}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative w-full">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          className="pl-8"
+                          value={editSessionUserSearchTerm}
+                          onChange={(e) => {
+                            setEditSessionUserSearchTerm(e.target.value)
+                            setShowEditSessionUserDropdown(true)
+                          }}
+                          onFocus={() => setShowEditSessionUserDropdown(true)}
+                          autoFocus={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {showEditSessionUserDropdown && !currentSession.userName && (
+                    <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover shadow-md">
+                      {filteredEditSessionUsers.length > 0 ? (
+                        filteredEditSessionUsers.map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex cursor-pointer flex-col px-3 py-2 hover:bg-accent"
+                            onClick={() => handleEditUserChangeForSession(user)}
+                          >
+                            <div>{user.name}</div>
+                            <div className="text-xs text-muted-foreground">{user.email}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-muted-foreground">No users found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="edit-mentor">Mentor</Label>
                 <Select
@@ -1082,6 +1366,7 @@ export default function UserMentoringPage() {
                     type="date"
                     value={currentSession.date}
                     onChange={(e) => setCurrentSession({ ...currentSession, date: e.target.value })}
+                    autoFocus={false}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -1091,8 +1376,24 @@ export default function UserMentoringPage() {
                     type="time"
                     value={currentSession.time.replace(" AM", "").replace(" PM", "")}
                     onChange={(e) => setCurrentSession({ ...currentSession, time: e.target.value })}
+                    autoFocus={false}
                   />
                 </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="edit-link">Meeting Link (optional)</Label>
+                <Input
+                  id="edit-link"
+                  type="url"
+                  placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                  value={currentSession.link || ""}
+                  onChange={(e) => setCurrentSession({ ...currentSession, link: e.target.value })}
+                  autoFocus={false}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Add a link to the virtual meeting room (Zoom, Google Meet, etc.)
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1125,6 +1426,7 @@ export default function UserMentoringPage() {
                     onChange={(e) =>
                       setCurrentSession({ ...currentSession, creditsUsed: Number.parseInt(e.target.value) || 0 })
                     }
+                    autoFocus={false}
                   />
                 </div>
               </div>
@@ -1154,6 +1456,7 @@ export default function UserMentoringPage() {
                   value={currentSession.notes}
                   onChange={(e) => setCurrentSession({ ...currentSession, notes: e.target.value })}
                   rows={3}
+                  autoFocus={false}
                 />
               </div>
             </div>
@@ -1171,7 +1474,7 @@ export default function UserMentoringPage() {
 
       {/* Add Credit Purchase Dialog */}
       <Dialog open={isAddingCredit} onOpenChange={setIsAddingCredit}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px]" autoFocus={false}>
           <DialogHeader>
             <DialogTitle>Add New Credit Purchase</DialogTitle>
             <DialogDescription>Record a new credit purchase for a user.</DialogDescription>
@@ -1179,18 +1482,55 @@ export default function UserMentoringPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="credit-user">User</Label>
-              <Select value={newCredit.userId} onValueChange={handleUserChangeForCredit}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a user" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockUsers.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="relative" ref={creditUserSearchRef}>
+                <div className="flex">
+                  {newCredit.userName ? (
+                    <div className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <div>
+                        <div>{newCredit.userName}</div>
+                        <div className="text-xs text-muted-foreground">{newCredit.userEmail}</div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="h-auto p-0" onClick={clearCreditUserSelection}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="relative w-full">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Search users..."
+                        className="pl-8"
+                        value={creditUserSearchTerm}
+                        onChange={(e) => {
+                          setCreditUserSearchTerm(e.target.value)
+                          setShowCreditUserDropdown(true)
+                        }}
+                        onFocus={() => setShowCreditUserDropdown(true)}
+                        autoFocus={false}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {showCreditUserDropdown && !newCredit.userName && (
+                  <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover shadow-md">
+                    {filteredCreditUsers.length > 0 ? (
+                      filteredCreditUsers.map((user) => (
+                        <div
+                          key={user.id}
+                          className="flex cursor-pointer flex-col px-3 py-2 hover:bg-accent"
+                          onClick={() => handleUserChangeForCredit(user)}
+                        >
+                          <div>{user.name}</div>
+                          <div className="text-xs text-muted-foreground">{user.email}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-muted-foreground">No users found</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -1202,6 +1542,7 @@ export default function UserMentoringPage() {
                   min="1"
                   value={newCredit.amount}
                   onChange={(e) => setNewCredit({ ...newCredit, amount: Number.parseInt(e.target.value) || 0 })}
+                  autoFocus={false}
                 />
               </div>
               <div className="grid gap-2">
@@ -1212,6 +1553,7 @@ export default function UserMentoringPage() {
                   min="0"
                   value={newCredit.price}
                   onChange={(e) => setNewCredit({ ...newCredit, price: Number.parseInt(e.target.value) || 0 })}
+                  autoFocus={false}
                 />
               </div>
             </div>
@@ -1223,6 +1565,7 @@ export default function UserMentoringPage() {
                 type="date"
                 value={newCredit.date}
                 onChange={(e) => setNewCredit({ ...newCredit, date: e.target.value })}
+                autoFocus={false}
               />
             </div>
 
@@ -1234,6 +1577,7 @@ export default function UserMentoringPage() {
                 value={newCredit.notes}
                 onChange={(e) => setNewCredit({ ...newCredit, notes: e.target.value })}
                 rows={3}
+                autoFocus={false}
               />
             </div>
           </div>
@@ -1254,12 +1598,65 @@ export default function UserMentoringPage() {
       {/* Edit Credit Purchase Dialog */}
       {currentCredit && (
         <Dialog open={isEditingCredit} onOpenChange={setIsEditingCredit}>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px]" autoFocus={false}>
             <DialogHeader>
               <DialogTitle>Edit Credit Purchase</DialogTitle>
               <DialogDescription>Update credit purchase details for {currentCredit.userName}.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-credit-user">User</Label>
+                <div className="relative" ref={editCreditUserSearchRef}>
+                  <div className="flex">
+                    {currentCredit.userName ? (
+                      <div className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
+                        <div>
+                          <div>{currentCredit.userName}</div>
+                          <div className="text-xs text-muted-foreground">{currentCredit.userEmail}</div>
+                        </div>
+                        <Button variant="ghost" size="sm" className="h-auto p-0" onClick={clearEditCreditUserSelection}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="relative w-full">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Search users..."
+                          className="pl-8"
+                          value={editCreditUserSearchTerm}
+                          onChange={(e) => {
+                            setEditCreditUserSearchTerm(e.target.value)
+                            setShowEditCreditUserDropdown(true)
+                          }}
+                          onFocus={() => setShowEditCreditUserDropdown(true)}
+                          autoFocus={false}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {showEditCreditUserDropdown && !currentCredit.userName && (
+                    <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover shadow-md">
+                      {filteredEditCreditUsers.length > 0 ? (
+                        filteredEditCreditUsers.map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex cursor-pointer flex-col px-3 py-2 hover:bg-accent"
+                            onClick={() => handleEditUserChangeForCredit(user)}
+                          >
+                            <div>{user.name}</div>
+                            <div className="text-xs text-muted-foreground">{user.email}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-3 py-2 text-sm text-muted-foreground">No users found</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="edit-credit-amount">Credits Amount</Label>
@@ -1271,6 +1668,7 @@ export default function UserMentoringPage() {
                     onChange={(e) =>
                       setCurrentCredit({ ...currentCredit, amount: Number.parseInt(e.target.value) || 0 })
                     }
+                    autoFocus={false}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -1283,6 +1681,7 @@ export default function UserMentoringPage() {
                     onChange={(e) =>
                       setCurrentCredit({ ...currentCredit, price: Number.parseInt(e.target.value) || 0 })
                     }
+                    autoFocus={false}
                   />
                 </div>
               </div>
@@ -1294,6 +1693,7 @@ export default function UserMentoringPage() {
                   type="date"
                   value={currentCredit.date}
                   onChange={(e) => setCurrentCredit({ ...currentCredit, date: e.target.value })}
+                  autoFocus={false}
                 />
               </div>
 
@@ -1305,6 +1705,7 @@ export default function UserMentoringPage() {
                   value={currentCredit.notes}
                   onChange={(e) => setCurrentCredit({ ...currentCredit, notes: e.target.value })}
                   rows={3}
+                  autoFocus={false}
                 />
               </div>
             </div>

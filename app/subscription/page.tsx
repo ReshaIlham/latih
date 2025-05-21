@@ -106,6 +106,15 @@ export default function SubscriptionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [subscriptionDuration, setSubscriptionDuration] = useState<"1" | "3" | "6" | "12">("1")
 
+  // Pre-fill user data when available
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "")
+      setEmail(user.email || "")
+      setPhone(user.phone || "")
+    }
+  }, [user])
+
   // Set initial certification if provided in URL
   useEffect(() => {
     if (initialCertId) {
@@ -750,9 +759,10 @@ export default function SubscriptionPage() {
                     <Input
                       id="name"
                       placeholder="Enter your full name"
-                      value={name}
+                      value={user?.name || name}
                       onChange={(e) => setName(e.target.value)}
-                      required
+                      disabled
+                      className="bg-muted/50"
                     />
                   </div>
 
@@ -762,9 +772,10 @@ export default function SubscriptionPage() {
                       id="email"
                       type="email"
                       placeholder="Enter your email address"
-                      value={email}
+                      value={user?.email || email}
                       onChange={(e) => setEmail(e.target.value)}
-                      required
+                      disabled
+                      className="bg-muted/50"
                     />
                   </div>
 
@@ -773,9 +784,10 @@ export default function SubscriptionPage() {
                     <Input
                       id="phone"
                       placeholder="Enter your phone number"
-                      value={phone}
+                      value={user?.phone || phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      required
+                      disabled
+                      className="bg-muted/50"
                     />
                   </div>
 

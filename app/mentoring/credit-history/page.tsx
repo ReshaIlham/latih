@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth-provider"
-import { ArrowLeft, Calendar, Clock, Coins } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, Coins, Link2 } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 export default function MentoringHistoryPage() {
   const { user } = useAuth()
@@ -22,6 +23,16 @@ export default function MentoringHistoryPage() {
       date: "2023-05-10T14:30:00Z",
       paymentId: "PAY-123456",
       status: "completed",
+      verificationStatus: "verified",
+    },
+    {
+      id: "ch002", // Add this new pending verification example
+      type: "purchase",
+      amount: 5,
+      date: "2023-05-20T09:15:00Z",
+      paymentId: "PAY-789012",
+      status: "pending",
+      verificationStatus: "pending",
     },
     {
       id: "ch003",
@@ -53,6 +64,7 @@ export default function MentoringHistoryPage() {
       topic: "PSM I Certification Preparation",
       status: "completed",
       notes: "Focused on Scrum events and artifacts",
+      link: "https://meet.google.com/abc-defg-hij",
     },
     {
       id: "MS-345678",
@@ -62,6 +74,7 @@ export default function MentoringHistoryPage() {
       topic: "PMP Exam Strategy",
       status: "completed",
       notes: "Reviewed practice questions and time management techniques",
+      link: "",
     },
     {
       id: "MS-901234",
@@ -70,6 +83,7 @@ export default function MentoringHistoryPage() {
       mentorName: "Michael Johnson",
       topic: "AWS Solutions Architect Certification",
       status: "scheduled",
+      link: "https://zoom.us/j/1234567890",
     },
   ]
 
@@ -167,7 +181,17 @@ export default function MentoringHistoryPage() {
                         </div>
                       </div>
                       {transaction.type === "purchase" && (
-                        <p className="text-sm text-muted-foreground pl-10">Payment ID: {transaction.paymentId}</p>
+                        <div className="pl-10 flex items-center gap-2">
+                          <p className="text-sm text-muted-foreground">Payment ID: {transaction.paymentId}</p>
+                          {transaction.verificationStatus && (
+                            <Badge
+                              variant={transaction.verificationStatus === "verified" ? "default" : "outline"}
+                              className={transaction.verificationStatus === "verified" ? "bg-blue-500" : ""}
+                            >
+                              {transaction.verificationStatus === "verified" ? "Verified" : "Pending"}
+                            </Badge>
+                          )}
+                        </div>
                       )}
                       {transaction.type === "bonus" && (
                         <p className="text-sm text-muted-foreground pl-10">Source: {transaction.source}</p>
@@ -231,7 +255,17 @@ export default function MentoringHistoryPage() {
                         >
                           {session.status === "completed" ? "Completed" : "Scheduled"}
                         </span>
-                        {/* Join button removed */}
+                        {session.status === "scheduled" && session.link && (
+                          <a
+                            href={session.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs px-2 py-1 rounded-full bg-primary text-white flex items-center gap-1"
+                          >
+                            <Link2 className="h-3 w-3" />
+                            Join
+                          </a>
+                        )}
                       </div>
                     </div>
                     <div className="pl-10">
@@ -246,8 +280,22 @@ export default function MentoringHistoryPage() {
                           <span className="font-medium">Notes:</span> {session.notes}
                         </p>
                       )}
+                      {session.link && (
+                        <p className="text-sm">
+                          <span className="font-medium">Meeting Link:</span>{" "}
+                          <a
+                            href={session.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline flex items-center gap-1 inline-flex"
+                          >
+                            {session.link.substring(0, 30)}
+                            {session.link.length > 30 ? "..." : ""}
+                            <Link2 className="h-3 w-3" />
+                          </a>
+                        </p>
+                      )}
                     </div>
-                    {/* Session notes button removed */}
                   </div>
                 ))}
               </div>

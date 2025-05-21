@@ -44,10 +44,38 @@ export function Footer() {
         >
           <motion.div variants={itemVariants}>
             <div className="flex items-center mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <span className="text-lg font-bold">L</span>
+              <div className="flex items-center">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="mr-1"
+                >
+                  <defs>
+                    <linearGradient id="footerLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#ff3e3e" />
+                      <stop offset="100%" stopColor="#ff7676" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    d="M12 2L4 6V12C4 15.31 7.58 19.81 12 22C16.42 19.81 20 15.31 20 12V6L12 2Z"
+                    fill="url(#footerLogoGradient)"
+                    stroke="none"
+                  />
+                  <path
+                    d="M8.5 12L11 14.5L16 9.5"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="text-xl font-bold bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">
+                  Latih
+                </span>
               </div>
-              <span className="ml-2 text-xl font-bold">Latih</span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Practice for certification exams with customized tests tailored to your certification needs.

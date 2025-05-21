@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth-provider"
 import { ArrowLeft, Calendar, Coins, CreditCard, MessageSquare } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 export default function PaymentHistoryPage() {
   const { user } = useAuth()
@@ -25,6 +26,7 @@ export default function PaymentHistoryPage() {
       duration: "1 month",
       paymentMethod: "Bank Transfer",
       paymentId: "INV-123456",
+      verificationStatus: "verified",
     },
     {
       id: "payment-2",
@@ -36,6 +38,19 @@ export default function PaymentHistoryPage() {
       duration: "3 months",
       paymentMethod: "Credit Card",
       paymentId: "INV-789012",
+      verificationStatus: "verified",
+    },
+    {
+      id: "payment-3",
+      type: "Subscription",
+      item: "Professional Scrum Product Owner (PSPO)",
+      amount: 149000,
+      date: "2023-10-05T16:20:00Z",
+      status: "pending",
+      duration: "1 month",
+      paymentMethod: "Bank Transfer",
+      paymentId: "INV-567890",
+      verificationStatus: "pending",
     },
     {
       id: "payment-4",
@@ -47,6 +62,7 @@ export default function PaymentHistoryPage() {
       duration: "6 months",
       paymentMethod: "Bank Transfer",
       paymentId: "INV-345678",
+      verificationStatus: "verified",
     },
     {
       id: "payment-6",
@@ -58,6 +74,7 @@ export default function PaymentHistoryPage() {
       duration: "1 month",
       paymentMethod: "Bank Transfer",
       paymentId: "INV-901234",
+      verificationStatus: "verified",
     },
     {
       id: "payment-7",
@@ -69,6 +86,7 @@ export default function PaymentHistoryPage() {
       duration: "3 months",
       paymentMethod: "Credit Card",
       paymentId: "INV-567890",
+      verificationStatus: "verified",
     },
   ]
 
@@ -83,6 +101,7 @@ export default function PaymentHistoryPage() {
       status: "completed",
       paymentMethod: "Bank Transfer",
       paymentId: "INV-234567",
+      verificationStatus: "verified",
     },
     {
       id: "credit-2",
@@ -93,6 +112,7 @@ export default function PaymentHistoryPage() {
       status: "completed",
       paymentMethod: "Credit Card",
       paymentId: "INV-890123",
+      verificationStatus: "verified",
     },
     {
       id: "credit-3",
@@ -103,6 +123,18 @@ export default function PaymentHistoryPage() {
       status: "completed",
       paymentMethod: "Bank Transfer",
       paymentId: "INV-456789",
+      verificationStatus: "verified",
+    },
+    {
+      id: "credit-4",
+      type: "Mentoring Credits",
+      item: "5 Mentoring Credits",
+      amount: 125000,
+      date: "2023-10-10T10:15:00Z",
+      status: "pending",
+      paymentMethod: "Bank Transfer",
+      paymentId: "INV-654321",
+      verificationStatus: "pending",
     },
   ]
 
@@ -198,9 +230,19 @@ export default function PaymentHistoryPage() {
                       <p className="text-sm text-muted-foreground pl-10">
                         Duration: {payment.duration} • Payment ID: {payment.paymentId}
                       </p>
+                      <p className="text-sm text-muted-foreground pl-10">
+                        Method: {payment.paymentMethod} • Status:{" "}
+                        {payment.status === "pending" ? "Pending" : "Completed"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-lg font-bold text-blue-600">{formatCurrency(payment.amount)}</p>
+                      <Badge
+                        variant={payment.verificationStatus === "verified" ? "default" : "outline"}
+                        className={payment.verificationStatus === "verified" ? "bg-blue-500" : ""}
+                      >
+                        {payment.verificationStatus === "verified" ? "Verified" : "Pending"}
+                      </Badge>
                     </div>
                   </div>
                 ))}
@@ -238,10 +280,21 @@ export default function PaymentHistoryPage() {
                           <p className="text-sm text-muted-foreground">{formatDate(payment.date)}</p>
                         </div>
                       </div>
-                      <p className="text-sm text-muted-foreground pl-10">Payment ID: {payment.paymentId}</p>
+                      <p className="text-sm text-muted-foreground pl-10">
+                        Payment ID: {payment.paymentId} • Method: {payment.paymentMethod}
+                      </p>
+                      <p className="text-sm text-muted-foreground pl-10">
+                        Status: {payment.status === "pending" ? "Pending" : "Completed"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-lg font-bold text-green-600">{formatCurrency(payment.amount)}</p>
+                      <Badge
+                        variant={payment.verificationStatus === "verified" ? "default" : "outline"}
+                        className={payment.verificationStatus === "verified" ? "bg-blue-500" : ""}
+                      >
+                        {payment.verificationStatus === "verified" ? "Verified" : "Pending"}
+                      </Badge>
                     </div>
                   </div>
                 ))}

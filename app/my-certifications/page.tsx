@@ -20,6 +20,7 @@ import {
   CreditCard,
   History,
   Coins,
+  Link2,
 } from "lucide-react"
 import { motion } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -183,7 +184,7 @@ const mentoringCredits = {
   lastPurchase: "2023-10-05",
 }
 
-// Update the upcomingMentoringSessions array to include more entries
+// Update the upcomingMentoringSessions array to include more entries and meeting links
 const upcomingMentoringSessions = [
   {
     id: "session-1",
@@ -192,6 +193,7 @@ const upcomingMentoringSessions = [
     date: "2023-11-05",
     time: "10:00 AM",
     duration: 60,
+    link: "https://meet.google.com/abc-defg-hij",
   },
   {
     id: "session-2",
@@ -200,6 +202,7 @@ const upcomingMentoringSessions = [
     date: "2023-11-10",
     time: "2:00 PM",
     duration: 90,
+    link: "https://zoom.us/j/1234567890",
   },
   {
     id: "session-3",
@@ -208,6 +211,7 @@ const upcomingMentoringSessions = [
     date: "2023-11-12",
     time: "11:30 AM",
     duration: 60,
+    link: "",
   },
   {
     id: "session-4",
@@ -216,6 +220,7 @@ const upcomingMentoringSessions = [
     date: "2023-11-15",
     time: "3:00 PM",
     duration: 45,
+    link: "https://teams.microsoft.com/l/meetup-join/abc123",
   },
   {
     id: "session-5",
@@ -224,6 +229,7 @@ const upcomingMentoringSessions = [
     date: "2023-11-18",
     time: "9:00 AM",
     duration: 120,
+    link: "https://meet.google.com/xyz-abcd-efg",
   },
 ]
 
@@ -508,7 +514,7 @@ export default function MyCertificationsPage() {
             <TabsContent value="tests" className="space-y-4 sm:space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg sm:text-xl font-semibold">Recent Tests</h2>
-                <Link href={`/test-history/${user.id}`}>
+                <Link href="/test-history">
                   <Button variant="ghost" size="sm" className="gap-1 text-primary text-xs sm:text-sm">
                     View All Tests
                     <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -690,6 +696,17 @@ export default function MyCertificationsPage() {
                                   <div>
                                     <h4 className="font-medium text-sm sm:text-base">{session.certification}</h4>
                                     <p className="text-xs sm:text-sm text-muted-foreground">with {session.mentor}</p>
+                                    {session.link && (
+                                      <a
+                                        href={session.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-1"
+                                      >
+                                        <Link2 className="h-3 w-3" />
+                                        Join Meeting
+                                      </a>
+                                    )}
                                   </div>
                                   <div className="flex items-center gap-3 sm:gap-4">
                                     <div className="text-center">

@@ -38,8 +38,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/auth-provider"
-import { Search, UserCog, Trash2, RefreshCw, Plus, X, ChevronLeft, ChevronRight, History } from "lucide-react"
-import Link from "next/link"
+import { Search, UserCog, Trash2, RefreshCw, Plus, X, ChevronLeft, ChevronRight } from "lucide-react"
 
 // Updated User type without expiresAt field
 type User = {
@@ -501,13 +500,6 @@ export default function UserManagementPage() {
                       <RefreshCw className="h-4 w-4" />
                       <span className="sr-only">Reset Password</span>
                     </Button>
-
-                    <Link href={`/test-history/${user.id}`}>
-                      <Button variant="ghost" size="icon" title="View Test History">
-                        <History className="h-4 w-4 text-primary" />
-                        <span className="sr-only">Test History</span>
-                      </Button>
-                    </Link>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
