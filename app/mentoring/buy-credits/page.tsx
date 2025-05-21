@@ -713,9 +713,9 @@ export default function BuyCreditsPage() {
                   <CreditCard className="h-4 w-4" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Credit History</p>
+                  <p className="text-sm font-medium">Payment History</p>
                   <p className="text-xs text-muted-foreground">
-                    You can view your credit history and transaction status in the Credit History page.
+                    You can view your payment history and subscription status in the My Certifications page.
                   </p>
                 </div>
               </div>
@@ -734,8 +734,8 @@ export default function BuyCreditsPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row gap-3 border-t pt-6 bg-muted/10">
-            <Link href="/mentoring/credit-history" className="w-full">
-              <Button className="w-full">View Credit History</Button>
+            <Link href="/my-certifications" className="w-full">
+              <Button className="w-full">Go to My Certifications</Button>
             </Link>
             <Link href="/mentoring" className="w-full">
               <Button variant="outline" className="w-full">
