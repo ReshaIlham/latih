@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/lib/auth-provider"
 import { SubscriptionProvider } from "@/lib/subscription-provider"
 import Header from "@/components/header"
+import { Footer } from "@/components/footer"
 import { Analytics } from "@/components/analytics"
 import "./globals.css"
 import { Suspense } from "react"
@@ -32,9 +33,10 @@ export default function RootLayout({
                 <Header />
                 <div className="flex flex-1 pt-16">
                   <Suspense fallback={<div className="flex-1">Loading...</div>}>
-                    <main className="flex-1 pb-16 animate-fade-in">{children}</main>
+                    <main className="flex-1 animate-fade-in">{children}</main>
                   </Suspense>
                 </div>
+                <Footer />
               </div>
               <Toaster />
             </SubscriptionProvider>
