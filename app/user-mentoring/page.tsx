@@ -477,7 +477,7 @@ export default function UserMentoringPage() {
   }
 
   return (
-    <div className="container pt-10 py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">User Mentoring</h1>
         <p className="text-muted-foreground mt-2">Manage mentoring sessions and credit purchases</p>

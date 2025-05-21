@@ -20,8 +20,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PlusCircle, Pencil, Trash2, Search, Download, ChevronLeft, ChevronRight, FileSpreadsheet } from "lucide-react"
-import { BackButton } from "@/components/back-button"
+import {
+  PlusCircle,
+  Pencil,
+  Trash2,
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  FileSpreadsheet,
+  ArrowLeft,
+} from "lucide-react"
 import type { TestDomain } from "@/lib/types"
 import * as XLSX from "xlsx"
 
@@ -41,6 +50,7 @@ const mockQuestions = [
       "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
     domain: "role",
     correctRate: 82,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q2",
@@ -56,6 +66,7 @@ const mockQuestions = [
       "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
     domain: "artifact",
     correctRate: 75,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q3",
@@ -71,6 +82,7 @@ const mockQuestions = [
       "For a one-month Sprint, Sprint Planning is time-boxed to a maximum of eight hours. For shorter Sprints, the event is proportionally shorter.",
     domain: "event",
     correctRate: 68,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q4",
@@ -85,6 +97,7 @@ const mockQuestions = [
     explanation: "The Product Owner is solely responsible for ordering the Product Backlog to maximize value.",
     domain: "role",
     correctRate: 90,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q5",
@@ -99,6 +112,7 @@ const mockQuestions = [
     explanation: "During the Daily Scrum, team members plan their work for the next 24 hours and coordinate efforts.",
     domain: "event",
     correctRate: 85,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q6",
@@ -114,6 +128,7 @@ const mockQuestions = [
       "The Sprint Review is held at the end of the Sprint to inspect the increment and adapt the Product Backlog if needed.",
     domain: "event",
     correctRate: 78,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q7",
@@ -129,6 +144,7 @@ const mockQuestions = [
       "The recommended size for a Scrum Team is typically 7 plus or minus 2 people, with a maximum of 9 to maintain effective communication.",
     domain: "role",
     correctRate: 72,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q8",
@@ -144,6 +160,7 @@ const mockQuestions = [
       "The Definition of Done is a shared understanding of what it means for work to be complete, ensuring transparency.",
     domain: "artifact",
     correctRate: 80,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q9",
@@ -159,6 +176,7 @@ const mockQuestions = [
       "The entire Scrum Team (Development Team, Scrum Master, and Product Owner) participates in Sprint Planning.",
     domain: "event",
     correctRate: 88,
+    source: "Scrum Guide 2020",
   },
   {
     id: "q10",
@@ -174,6 +192,7 @@ const mockQuestions = [
       "The Sprint Backlog makes visible all the work that the Development Team identifies as necessary to meet the Sprint Goal.",
     domain: "artifact",
     correctRate: 76,
+    source: "Scrum Guide 2020",
   },
 ]
 
@@ -203,6 +222,7 @@ const sampleTemplateData = [
     "correct answer": "b",
     explanation:
       "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
+    source: "Scrum Guide 2020",
   },
   {
     question: "Which of the following is NOT a Scrum artifact?",
@@ -214,6 +234,7 @@ const sampleTemplateData = [
     "correct answer": "c",
     explanation:
       "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
+    source: "Scrum Guide 2020",
   },
 ]
 
@@ -257,6 +278,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
     correctOption: "a",
     explanation: "",
     domain: "role" as TestDomain,
+    source: "", // Add source field
   }
 
   const [newQuestion, setNewQuestion] = useState(emptyQuestionTemplate)
@@ -367,6 +389,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
         "correct answer": "b",
         explanation:
           "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
+        source: "Scrum Guide 2020",
       },
       {
         question: "Which of the following is NOT a Scrum artifact?",
@@ -378,6 +401,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
         "correct answer": "c",
         explanation:
           "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
+        source: "Scrum Guide 2020",
       },
     ]
 
@@ -411,10 +435,18 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
-        <BackButton href="/certifications-management" />
-        <h1 className="mt-6 text-3xl font-bold">Manage Questions</h1>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push("/certifications-management")}
+          className="gap-1 mb-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">Manage Questions</h1>
         <p className="text-muted-foreground mt-2">Certification: Scrum Master</p>
       </div>
 
@@ -713,6 +745,16 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="source">Source</Label>
+              <Input
+                id="source"
+                placeholder="e.g., Scrum Guide 2020, PMI PMBOK 6th Edition"
+                value={newQuestion.source}
+                onChange={(e) => setNewQuestion({ ...newQuestion, source: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="domain">Domain</Label>
               <Select
                 value={newQuestion.domain}
@@ -803,6 +845,16 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="edit-source">Source</Label>
+                <Input
+                  id="edit-source"
+                  placeholder="e.g., Scrum Guide 2020, PMI PMBOK 6th Edition"
+                  value={currentQuestion.source}
+                  onChange={(e) => setCurrentQuestion({ ...currentQuestion, source: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="edit-domain">Domain</Label>
                 <Select
                   value={currentQuestion.domain}
@@ -847,6 +899,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                     <TableHead>Domain</TableHead>
                     <TableHead>Options</TableHead>
                     <TableHead>Correct Answer</TableHead>
+                    <TableHead>Source</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -871,6 +924,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                         </div>
                       </TableCell>
                       <TableCell className="uppercase font-medium">{item["correct answer"]}</TableCell>
+                      <TableCell>{item.source}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

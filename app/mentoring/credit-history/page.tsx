@@ -86,9 +86,9 @@ export default function MentoringHistoryPage() {
   }
 
   return (
-    <div className="container py-10">
-      <div className="flex items-center gap-2 mb-6">
-        <Button variant="ghost" size="sm" onClick={() => router.push("/mentoring")} className="gap-1">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="mb-6">
+        <Button variant="ghost" size="sm" onClick={() => router.push("/mentoring")} className="gap-1 mb-2">
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>

@@ -33,7 +33,7 @@ export default function MentoringPage() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-4 mb-8">
         <h1 className="text-3xl font-bold">Mentoring Sessions</h1>
         <p className="text-muted-foreground">

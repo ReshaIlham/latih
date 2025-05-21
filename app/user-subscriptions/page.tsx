@@ -425,7 +425,7 @@ export default function UserSubscriptionsPage() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">User Subscriptions</h1>
         <p className="text-muted-foreground mt-2">Manage and monitor user subscription plans</p>

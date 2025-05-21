@@ -247,24 +247,14 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8 space-y-4">
-        <div className="flex items-center gap-2">
-          <Link href="/certifications">
-            <Button
-              variant="outline"
-              size="default"
-              className="flex items-center gap-2 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Certifications
-            </Button>
-          </Link>
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold">{certification.name}</h1>
-          <p className="text-muted-foreground mt-2">{certification.description}</p>
-        </div>
+        <Button variant="ghost" size="sm" onClick={() => router.push("/certifications")} className="gap-1 mb-2">
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">{certification.name}</h1>
+        <p className="text-muted-foreground">{certification.description}</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">

@@ -275,22 +275,16 @@ export default function Home() {
                 </motion.p>
               </div>
               <motion.div variants={itemVariants} className="flex flex-col gap-2 sm:flex-row">
-                <Link href={user ? "/certifications" : "/signup"} className="w-full sm:w-auto">
+                <Link href="/certifications" className="w-full sm:w-auto">
                   <Button
                     size="lg"
                     className="w-full sm:w-auto gap-1.5 shadow-lg hover:shadow-xl transition-all group relative overflow-hidden"
                   >
                     <span className="relative z-10 flex items-center gap-2">
-                      {user ? "Browse Certifications" : "Get Started"}
+                      Get Started
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </span>
                     <span className="absolute inset-0 bg-primary/90 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                  </Button>
-                </Link>
-                <Link href="/how-it-works">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto group">
-                    How It Works
-                    <span className="ml-2 transition-transform group-hover:translate-x-1">→</span>
                   </Button>
                 </Link>
               </motion.div>
@@ -924,10 +918,10 @@ export default function Home() {
               </p>
             </motion.div>
             <motion.div variants={itemVariants} className="w-full max-w-md space-y-2">
-              <Link href={user ? "/certifications" : "/signup"} className="w-full">
+              <Link href="/certifications" className="w-full">
                 <Button size="lg" className="w-full shadow-lg hover:shadow-xl transition-all group">
                   <span className="relative z-10 flex items-center">
-                    {user ? "Browse Certifications" : "Get Started Today"}
+                    Get Started Today
                     <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                   </span>
                 </Button>

@@ -6,9 +6,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { BackButton } from "@/components/back-button"
 import { useAuth } from "@/lib/auth-provider"
-import { CheckCircle, XCircle, Calendar, BarChart3, BookOpen, Info, Search, Filter } from "lucide-react"
+import { CheckCircle, XCircle, Calendar, BarChart3, BookOpen, Info, Search, Filter, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -166,12 +165,12 @@ export default function TestHistoryPage() {
 
   return (
     <div className="container py-6 md:py-10">
-      <div className="mb-6">
-        <BackButton label="Back to My Certifications" href="/my-certifications" />
-      </div>
-
       <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Test History</h1>
+        <Button variant="ghost" size="sm" onClick={() => router.push("/my-certifications")} className="gap-1 mb-2">
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">Test History</h1>
         <p className="text-muted-foreground">Review your past test attempts and track your progress over time</p>
       </div>
 

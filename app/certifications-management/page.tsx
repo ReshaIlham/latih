@@ -209,7 +209,7 @@ export default function CertificationsManagementPage() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8 space-y-4">
         <h1 className="text-3xl font-bold">Certification Management</h1>
         <p className="text-muted-foreground">Manage certification exams, questions, and analytics</p>

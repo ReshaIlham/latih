@@ -5,7 +5,7 @@ import { Mail, Phone, MessageSquare } from "lucide-react"
 
 export default function ContactPage() {
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Contact Us</h1>

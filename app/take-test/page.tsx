@@ -15,7 +15,6 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { BackButton } from "@/components/back-button"
 import { Clock, ArrowLeft, ArrowRight, CheckCircle, Flag, Calendar, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Question } from "@/lib/types"
@@ -339,33 +338,36 @@ export default function TakeTestPage() {
   return (
     <div className="container py-6 md:py-10">
       <div className="mb-6">
-        <BackButton label="Back to Certification" href={`/certifications/${certificationId}`} />
-      </div>
-
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold">{getCertificationName(certificationId)}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-sm text-muted-foreground">Test ID: {testId}</p>
-              <span className="text-muted-foreground">•</span>
-              <p className="text-sm text-muted-foreground">{getTestTypeName(testType)}</p>
-            </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push(`/certifications/${certificationId}`)}
+          className="gap-1 mb-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">{getCertificationName(certificationId)}</h1>
+        <div className="flex flex-wrap items-center gap-2 mt-1">
+          <p className="text-sm text-muted-foreground">Test ID: {testId}</p>
+          <span className="text-muted-foreground">•</span>
+          <p className="text-sm text-muted-foreground">{getTestTypeName(testType)}</p>
+          <span className="text-muted-foreground">•</span>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span>{formatDateTime(testStartTime)}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-sm font-medium">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>{formatDateTime(testStartTime)}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-md bg-muted px-3 py-1.5 text-sm font-medium">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className={`${timeRemaining < 60 ? "text-red-500 animate-pulse" : ""}`}>
-                {formatTime(timeRemaining)}
-              </span>
-            </div>
+          <span className="text-muted-foreground">•</span>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span className={`${timeRemaining < 60 ? "text-red-500 animate-pulse" : ""}`}>
+              {formatTime(timeRemaining)}
+            </span>
           </div>
         </div>
+      </div>
 
+      <div className="w-full">
         {/* Question navigation and content */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Question navigation sidebar */}

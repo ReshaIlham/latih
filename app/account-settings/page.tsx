@@ -127,7 +127,7 @@ export default function AccountSettingsPage() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Account Settings</h1>
         <p className="text-muted-foreground">Manage your account information and security settings</p>

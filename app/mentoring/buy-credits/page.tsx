@@ -121,8 +121,8 @@ export default function BuyCreditsPage() {
     const whatsappUrl = `https://wa.me/628123456789?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
 
-    // Move to confirmation step
-    setCurrentStep(STEPS.CONFIRMATION)
+    // Remove the line that moves to confirmation step
+    // setCurrentStep(STEPS.CONFIRMATION)
   }
 
   const handleSelectPackage = (packageId: string) => {
@@ -448,6 +448,7 @@ export default function BuyCreditsPage() {
             onClick={() => {
               setPaymentMethod("whatsapp")
               handleContactAdmin()
+              // Don't change the step
             }}
           >
             <CardHeader>
@@ -784,8 +785,8 @@ export default function BuyCreditsPage() {
   }
 
   return (
-    <div className="container py-10">
-      <div className="max-w-4xl mx-auto">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="mx-auto">
         {currentStep < STEPS.CONFIRMATION && renderStepIndicators()}
         {currentStep === STEPS.SELECT_PACKAGE && renderSelectPackage()}
         {currentStep === STEPS.PAYMENT_METHOD && renderPaymentMethod()}

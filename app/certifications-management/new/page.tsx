@@ -12,8 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/lib/auth-provider"
-import { Plus, Minus, Upload, Coins } from "lucide-react"
-import { BackButton } from "@/components/back-button"
+import { Plus, Minus, Upload, Coins, ArrowLeft } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -244,10 +243,18 @@ export default function NewCertificationPage() {
   }
 
   return (
-    <div className="container py-10">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
-        <BackButton href="/certifications-management" />
-        <h1 className="mt-6 text-3xl font-bold">Add New Certification</h1>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push("/certifications-management")}
+          className="gap-1 mb-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">Add New Certification</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

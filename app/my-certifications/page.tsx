@@ -296,7 +296,7 @@ export default function MyCertificationsPage() {
 
   return (
     <div className="bg-gradient-to-b from-background to-muted/20 min-h-screen">
-      <div className="container pt-10 pb-4 sm:pb-6 md:pb-8 px-4 sm:px-6">
+      <div className="container pt-10 pb-4 sm:pb-6 md:pb-8">
         {/* Header Section with User Welcome and Stats */}
         <div className="mb-6 md:mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">

@@ -13,8 +13,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { BackButton } from "@/components/back-button"
-import { CheckCircle, XCircle, Info, Lock, Coins } from "lucide-react"
+import { CheckCircle, XCircle, Info, Lock, Coins, ArrowLeft } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth-provider"
@@ -36,6 +35,7 @@ const mockQuestions: Question[] = [
       "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
     domain: "role",
     difficulty: "medium",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q2",
@@ -51,6 +51,7 @@ const mockQuestions: Question[] = [
       "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
     domain: "artifact",
     difficulty: "easy",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q3",
@@ -66,6 +67,7 @@ const mockQuestions: Question[] = [
       "For a one-month Sprint, Sprint Planning is time-boxed to a maximum of eight hours. For shorter Sprints, the event is proportionally shorter.",
     domain: "event",
     difficulty: "medium",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q4",
@@ -80,6 +82,7 @@ const mockQuestions: Question[] = [
     explanation: "The Product Owner is responsible for ordering the items in the Product Backlog to maximize value.",
     domain: "role",
     difficulty: "easy",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q5",
@@ -95,6 +98,7 @@ const mockQuestions: Question[] = [
       "During the Daily Scrum, the Development Team plans work for the next 24 hours, inspecting progress toward the Sprint Goal.",
     domain: "event",
     difficulty: "medium",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q6",
@@ -110,6 +114,7 @@ const mockQuestions: Question[] = [
       "The Scrum Guide recommends that Scrum Teams be small enough to remain nimble and large enough to complete significant work. Typically, 10 or fewer people works best.",
     domain: "role",
     difficulty: "easy",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q7",
@@ -125,6 +130,7 @@ const mockQuestions: Question[] = [
       "The Sprint Review is a meeting held at the end of the Sprint to inspect the increment and adapt the Product Backlog if needed.",
     domain: "event",
     difficulty: "medium",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q8",
@@ -140,6 +146,7 @@ const mockQuestions: Question[] = [
       "The Sprint Retrospective is an opportunity for the Scrum Team to inspect itself and create a plan for improvements to be enacted during the next Sprint.",
     domain: "event",
     difficulty: "medium",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q9",
@@ -154,6 +161,7 @@ const mockQuestions: Question[] = [
     explanation: "The Daily Scrum is time-boxed to 15 minutes, regardless of team size.",
     domain: "event",
     difficulty: "easy",
+    source: "Scrum Guide 2020",
   },
   {
     id: "q10",
@@ -169,6 +177,7 @@ const mockQuestions: Question[] = [
       "The five values of Scrum are Commitment, Focus, Openness, Respect, and Courage. Efficiency is not one of the Scrum values.",
     domain: "artifact",
     difficulty: "hard",
+    source: "Scrum Guide 2020",
   },
 ]
 
@@ -396,12 +405,16 @@ export default function TestResultsPage() {
   }
 
   return (
-    <div className="container py-6 md:py-10">
+    <div className="container py-6 md:py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-6">
-        <BackButton label="Back to Test History" href="/test-history" />
+        <Button variant="ghost" size="sm" onClick={() => router.push("/test-history")} className="gap-1 mb-2">
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <h1 className="text-2xl font-bold">Test Results</h1>
       </div>
 
-      <div className="mx-auto max-w-4xl">
+      <div className="w-full">
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl">Test Results</CardTitle>
@@ -609,10 +622,15 @@ export default function TestResultsPage() {
                 <p className="text-sm">{selectedQuestionForExplanation.explanation}</p>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex items-center gap-2">
                 <Badge variant="outline" className="capitalize text-xs">
                   Domain: {selectedQuestionForExplanation.domain}
                 </Badge>
+                {selectedQuestionForExplanation.source && (
+                  <Badge variant="outline" className="text-xs">
+                    Source: {selectedQuestionForExplanation.source}
+                  </Badge>
+                )}
               </div>
             </div>
           )}

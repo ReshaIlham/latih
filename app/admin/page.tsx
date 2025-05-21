@@ -966,7 +966,7 @@ export default function AdminDashboardPage() {
                     transition: { duration: 0.2 },
                   }}
                 >
-                  <Card className="overflow-hidden shadow-sm hover:shadow transition-all duration-300 bg-white rounded-lg">
+                  <Card className="overflow-hidden hover:shadow transition-all duration-300 bg-white rounded-lg">
                     <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
                       <h3 className="text-xl font-bold text-primary">{cert.name}</h3>
                       <div className="flex flex-wrap gap-2 mt-3">

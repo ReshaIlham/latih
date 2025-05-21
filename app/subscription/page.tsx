@@ -184,8 +184,8 @@ export default function SubscriptionPage() {
     const whatsappUrl = `https://wa.me/628123456789?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
 
-    // Move to confirmation step
-    setCurrentStep(STEPS.CONFIRMATION)
+    // Remove the line that moves to confirmation step
+    // setCurrentStep(STEPS.CONFIRMATION)
   }
 
   const handleSelectCertification = (certId: string) => {
@@ -266,7 +266,7 @@ export default function SubscriptionPage() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
           {mockCertifications.map((cert) => (
             <div key={cert.id} className="cursor-pointer" onClick={() => handleSelectCertification(cert.id)}>
               <CertificationCard
@@ -560,6 +560,7 @@ export default function SubscriptionPage() {
             onClick={() => {
               setPaymentMethod("whatsapp")
               handleContactAdmin()
+              // Don't change the step
             }}
           >
             <CardHeader>
@@ -948,8 +949,8 @@ export default function SubscriptionPage() {
   }
 
   return (
-    <div className="container py-10">
-      <div className="max-w-4xl mx-auto">
+    <div className="container py-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="mx-auto">
         {currentStep < STEPS.CONFIRMATION && renderStepIndicators()}
         {currentStep === STEPS.SELECT_CERTIFICATION && renderSelectCertification()}
         {currentStep === STEPS.PAYMENT_METHOD && renderPaymentMethod()}
