@@ -49,6 +49,7 @@ const mockQuestions = [
     explanation:
       "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
     domain: "role",
+    taskId: "t1",
     correctRate: 82,
     source: "Scrum Guide 2020",
   },
@@ -65,6 +66,7 @@ const mockQuestions = [
     explanation:
       "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
     domain: "artifact",
+    taskId: "t4",
     correctRate: 75,
     source: "Scrum Guide 2020",
   },
@@ -81,6 +83,7 @@ const mockQuestions = [
     explanation:
       "For a one-month Sprint, Sprint Planning is time-boxed to a maximum of eight hours. For shorter Sprints, the event is proportionally shorter.",
     domain: "event",
+    taskId: "t7",
     correctRate: 68,
     source: "Scrum Guide 2020",
   },
@@ -96,6 +99,7 @@ const mockQuestions = [
     correctOption: "c",
     explanation: "The Product Owner is solely responsible for ordering the Product Backlog to maximize value.",
     domain: "role",
+    taskId: "t2",
     correctRate: 90,
     source: "Scrum Guide 2020",
   },
@@ -111,6 +115,7 @@ const mockQuestions = [
     correctOption: "c",
     explanation: "During the Daily Scrum, team members plan their work for the next 24 hours and coordinate efforts.",
     domain: "event",
+    taskId: "t8",
     correctRate: 85,
     source: "Scrum Guide 2020",
   },
@@ -127,6 +132,7 @@ const mockQuestions = [
     explanation:
       "The Sprint Review is held at the end of the Sprint to inspect the increment and adapt the Product Backlog if needed.",
     domain: "event",
+    taskId: "t9",
     correctRate: 78,
     source: "Scrum Guide 2020",
   },
@@ -143,6 +149,7 @@ const mockQuestions = [
     explanation:
       "The recommended size for a Scrum Team is typically 7 plus or minus 2 people, with a maximum of 9 to maintain effective communication.",
     domain: "role",
+    taskId: "t3",
     correctRate: 72,
     source: "Scrum Guide 2020",
   },
@@ -159,6 +166,7 @@ const mockQuestions = [
     explanation:
       "The Definition of Done is a shared understanding of what it means for work to be complete, ensuring transparency.",
     domain: "artifact",
+    taskId: "t6",
     correctRate: 80,
     source: "Scrum Guide 2020",
   },
@@ -175,6 +183,7 @@ const mockQuestions = [
     explanation:
       "The entire Scrum Team (Development Team, Scrum Master, and Product Owner) participates in Sprint Planning.",
     domain: "event",
+    taskId: "t7",
     correctRate: 88,
     source: "Scrum Guide 2020",
   },
@@ -191,6 +200,7 @@ const mockQuestions = [
     explanation:
       "The Sprint Backlog makes visible all the work that the Development Team identifies as necessary to meet the Sprint Goal.",
     domain: "artifact",
+    taskId: "t5",
     correctRate: 76,
     source: "Scrum Guide 2020",
   },
@@ -210,11 +220,42 @@ const extendedMockQuestions = [...Array(30)].map((_, index) => {
 // Combine original and extended questions
 const allMockQuestions = [...mockQuestions, ...extendedMockQuestions]
 
+const mockDomains = [
+  {
+    id: "role",
+    name: "Roles",
+    tasks: [
+      { id: "t1", name: "Scrum Master Responsibilities", domainId: "role" },
+      { id: "t2", name: "Product Owner Duties", domainId: "role" },
+      { id: "t3", name: "Development Team Activities", domainId: "role" },
+    ],
+  },
+  {
+    id: "artifact",
+    name: "Artifacts",
+    tasks: [
+      { id: "t4", name: "Product Backlog Management", domainId: "artifact" },
+      { id: "t5", name: "Sprint Backlog Creation", domainId: "artifact" },
+      { id: "t6", name: "Increment Definition", domainId: "artifact" },
+    ],
+  },
+  {
+    id: "event",
+    name: "Events",
+    tasks: [
+      { id: "t7", name: "Sprint Planning", domainId: "event" },
+      { id: "t8", name: "Daily Scrum", domainId: "event" },
+      { id: "t9", name: "Sprint Review", domainId: "event" },
+    ],
+  },
+]
+
 // Sample bulk upload template data
 const sampleTemplateData = [
   {
     question: "What is the primary responsibility of a Scrum Master?",
     domain: "role",
+    task: "Scrum Master Responsibilities",
     "option a": "Managing the team and assigning tasks",
     "option b": "Facilitating Scrum events and removing impediments",
     "option c": "Writing user stories and managing the product backlog",
@@ -227,6 +268,7 @@ const sampleTemplateData = [
   {
     question: "Which of the following is NOT a Scrum artifact?",
     domain: "artifact",
+    task: "Product Backlog Management",
     "option a": "Product Backlog",
     "option b": "Sprint Backlog",
     "option c": "Burndown Chart",
@@ -250,6 +292,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
   const [questionsPerPage, setQuestionsPerPage] = useState(10)
   const [bulkUploadPreview, setBulkUploadPreview] = useState<any[]>([])
   const [showBulkPreview, setShowBulkPreview] = useState(false)
+  const [availableTasks, setAvailableTasks] = useState<any[]>([])
   const router = useRouter()
   const { toast } = useToast()
 
@@ -278,10 +321,31 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
     correctOption: "a",
     explanation: "",
     domain: "role" as TestDomain,
+    taskId: "",
     source: "", // Add source field
   }
 
   const [newQuestion, setNewQuestion] = useState(emptyQuestionTemplate)
+
+  // Function to get tasks for selected domain
+  const getTasksForDomain = (domainId: string) => {
+    const domain = mockDomains.find((d) => d.id === domainId)
+    return domain ? domain.tasks : []
+  }
+
+  // Update available tasks when domain changes
+  const handleDomainChange = (domain: string, isNewQuestion = false) => {
+    const tasks = getTasksForDomain(domain)
+    setAvailableTasks(tasks)
+
+    if (isNewQuestion) {
+      setNewQuestion({
+        ...newQuestion,
+        domain: domain as TestDomain,
+        taskId: tasks.length > 0 ? tasks[0].id : "",
+      })
+    }
+  }
 
   const handleAddQuestion = () => {
     // Validate form
@@ -382,6 +446,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
       {
         question: "What is the primary responsibility of a Scrum Master?",
         domain: "role",
+        task: "Scrum Master Responsibilities",
         "option a": "Managing the team and assigning tasks",
         "option b": "Facilitating Scrum events and removing impediments",
         "option c": "Writing user stories and managing the product backlog",
@@ -394,6 +459,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
       {
         question: "Which of the following is NOT a Scrum artifact?",
         domain: "artifact",
+        task: "Product Backlog Management",
         "option a": "Product Backlog",
         "option b": "Sprint Backlog",
         "option c": "Burndown Chart",
@@ -462,7 +528,13 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Select value={selectedDomain} onValueChange={(value) => setSelectedDomain(value as TestDomain | "all")}>
+          <Select
+            value={selectedDomain}
+            onValueChange={(value) => {
+              handleDomainChange(value)
+              setSelectedDomain(value as TestDomain | "all")
+            }}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select domain" />
             </SelectTrigger>
@@ -479,7 +551,12 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
             <FileSpreadsheet className="mr-2 h-4 w-4" />
             Excel Upload
           </Button>
-          <Button onClick={() => setIsAddingQuestion(true)}>
+          <Button
+            onClick={() => {
+              setIsAddingQuestion(true)
+              handleDomainChange("role", true)
+            }}
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Question
           </Button>
@@ -537,6 +614,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
             <TableRow>
               <TableHead className="w-[40%]">Question</TableHead>
               <TableHead>Domain</TableHead>
+              <TableHead>Task</TableHead>
               <TableHead>Correct Answer</TableHead>
               <TableHead>Correct Answer Percentage</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -548,6 +626,13 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                 <TableRow key={question.id}>
                   <TableCell className="font-medium">{question.text}</TableCell>
                   <TableCell>{question.domain.charAt(0).toUpperCase() + question.domain.slice(1)}</TableCell>
+                  <TableCell>
+                    {(() => {
+                      const domain = mockDomains.find((d) => d.id === question.domain)
+                      const task = domain?.tasks.find((t) => t.id === question.taskId)
+                      return task ? task.name : "No task assigned"
+                    })()}
+                  </TableCell>
                   <TableCell className="uppercase font-medium">{question.correctOption}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -758,7 +843,9 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
               <Label htmlFor="domain">Domain</Label>
               <Select
                 value={newQuestion.domain}
-                onValueChange={(value) => setNewQuestion({ ...newQuestion, domain: value as TestDomain })}
+                onValueChange={(value) => {
+                  handleDomainChange(value, true)
+                }}
               >
                 <SelectTrigger id="domain">
                   <SelectValue placeholder="Select domain" />
@@ -767,6 +854,25 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                   <SelectItem value="role">Roles</SelectItem>
                   <SelectItem value="artifact">Artifacts</SelectItem>
                   <SelectItem value="event">Events</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="task">Task</Label>
+              <Select
+                value={newQuestion.taskId || ""}
+                onValueChange={(value) => setNewQuestion({ ...newQuestion, taskId: value })}
+              >
+                <SelectTrigger id="task">
+                  <SelectValue placeholder="Select task" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableTasks.map((task) => (
+                    <SelectItem key={task.id} value={task.id}>
+                      {task.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -870,6 +976,27 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-task">Task</Label>
+                <Select
+                  value={currentQuestion.taskId || ""}
+                  onValueChange={(value) => setCurrentQuestion({ ...currentQuestion, taskId: value })}
+                >
+                  <SelectTrigger id="edit-task">
+                    <SelectValue placeholder="Select task" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockDomains
+                      .find((domain) => domain.id === currentQuestion.domain)
+                      ?.tasks.map((task) => (
+                        <SelectItem key={task.id} value={task.id}>
+                          {task.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
           <DialogFooter>
@@ -897,6 +1024,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                   <TableRow>
                     <TableHead>Question</TableHead>
                     <TableHead>Domain</TableHead>
+                    <TableHead>Task</TableHead>
                     <TableHead>Options</TableHead>
                     <TableHead>Correct Answer</TableHead>
                     <TableHead>Source</TableHead>
@@ -907,6 +1035,7 @@ export default function ManageQuestionsPage({ params }: { params: { id: string }
                     <TableRow key={index}>
                       <TableCell className="font-medium">{item.question}</TableCell>
                       <TableCell>{item.domain}</TableCell>
+                      <TableCell>{item.task}</TableCell>
                       <TableCell>
                         <div className="space-y-1 text-sm">
                           <p>

@@ -1063,7 +1063,7 @@ export default function AdminDashboardPage() {
                                 <span className="text-sm font-medium">{cert.avgUserLifespan} months</span>
                               </div>
                               <div className="flex items-center justify-between">
-                                <span className="text-sm">Monthly Revenue</span>
+                                <span className="text-sm">Total Revenue</span>
                                 <span className="text-sm font-medium">
                                   {new Intl.NumberFormat("id-ID", {
                                     style: "currency",

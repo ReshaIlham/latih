@@ -12,7 +12,18 @@ export interface User {
 
 // Certification Types
 export type TestType = "full" | "medium" | "short"
-export type TestDomain = "role" | "artifact" | "event" | "all"
+
+export interface TestDomain {
+  id: string
+  name: string
+  tasks: TestTask[]
+}
+
+export interface TestTask {
+  id: string
+  name: string
+  domainId: string
+}
 
 export interface Certification {
   id: string
@@ -36,8 +47,10 @@ export interface Question {
     isCorrect: boolean
   }[]
   explanation: string
-  domain: TestDomain
+  domain: string
+  taskId?: string // Add task field
   difficulty: "easy" | "medium" | "hard"
+  source?: string
 }
 
 export interface Test {

@@ -19,10 +19,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 // Types
 type CertificationStatus = "active" | "not-active" | "coming-soon"
+
+type Task = {
+  id: string
+  name: string
+  domainId: string
+}
+
 type Domain = {
   id: string
   name: string
+  tasks: Task[]
 }
+
 type TestType = {
   id: string
   name: string
@@ -71,9 +80,30 @@ const mockCertifications = {
     status: "active" as CertificationStatus,
     lastUpdated: "2023-10-15T14:30:45",
     domains: [
-      { id: "d1", name: "Roles" },
-      { id: "d2", name: "Artifacts" },
-      { id: "d3", name: "Events" },
+      {
+        id: "d1",
+        name: "Roles",
+        tasks: [
+          { id: "t1", name: "Scrum Master Responsibilities", domainId: "d1" },
+          { id: "t2", name: "Product Owner Duties", domainId: "d1" },
+        ],
+      },
+      {
+        id: "d2",
+        name: "Artifacts",
+        tasks: [
+          { id: "t3", name: "Product Backlog Management", domainId: "d2" },
+          { id: "t4", name: "Sprint Backlog Creation", domainId: "d2" },
+        ],
+      },
+      {
+        id: "d3",
+        name: "Events",
+        tasks: [
+          { id: "t5", name: "Sprint Planning", domainId: "d3" },
+          { id: "t6", name: "Daily Scrum", domainId: "d3" },
+        ],
+      },
     ],
     testTypes: [
       { id: "t1", name: "Short Test", timeLimit: 30, questionCount: 40, passingGrade: 70, isPremium: false },
@@ -103,9 +133,30 @@ const mockCertifications = {
     status: "active" as CertificationStatus,
     lastUpdated: "2023-09-22T09:15:22",
     domains: [
-      { id: "d4", name: "Roles" },
-      { id: "d5", name: "Artifacts" },
-      { id: "d6", name: "Events" },
+      {
+        id: "d4",
+        name: "Roles",
+        tasks: [
+          { id: "t7", name: "Scrum Master Responsibilities", domainId: "d4" },
+          { id: "t8", name: "Product Owner Duties", domainId: "d4" },
+        ],
+      },
+      {
+        id: "d5",
+        name: "Artifacts",
+        tasks: [
+          { id: "t9", name: "Product Backlog Management", domainId: "d5" },
+          { id: "t10", name: "Sprint Backlog Creation", domainId: "d5" },
+        ],
+      },
+      {
+        id: "d6",
+        name: "Events",
+        tasks: [
+          { id: "t11", name: "Sprint Planning", domainId: "d6" },
+          { id: "t12", name: "Daily Scrum", domainId: "d6" },
+        ],
+      },
     ],
     testTypes: [
       { id: "t4", name: "Short Test", timeLimit: 30, questionCount: 30, passingGrade: 70, isPremium: false },
@@ -138,6 +189,9 @@ export default function EditCertificationPage({ params }: { params: { id: string
     isPremium: false,
   })
   const [activeTab, setActiveTab] = useState("basic")
+
+  const [newTask, setNewTask] = useState<string>("")
+  const [selectedDomainForTask, setSelectedDomainForTask] = useState<string>("")
 
   const { isAdmin } = useAuth()
   const { toast } = useToast()
@@ -235,6 +289,7 @@ export default function EditCertificationPage({ params }: { params: { id: string
         {
           id: `domain-${Date.now()}`,
           name: newDomain,
+          tasks: [],
         },
       ],
     })
@@ -249,6 +304,55 @@ export default function EditCertificationPage({ params }: { params: { id: string
       ...certification,
       domains: certification.domains.filter((domain) => domain.id !== domainId),
     })
+  }
+
+  const handleAddTask = (domainId: string) => {
+    if (!certification || !newTask) {
+      toast({
+        title: "Invalid task",
+        description: "Please provide a task name.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setCertification({
+      ...certification,
+      domains: certification.domains.map((domain) =>
+        domain.id === domainId
+          ? {
+              ...domain,
+              tasks: [
+                ...domain.tasks,
+                {
+                  id: `task-${Date.now()}`,
+                  name: newTask,
+                  domainId: domainId,
+                },
+              ],
+            }
+          : domain,
+      ),
+    })
+
+    setNewTask("")
+    setSelectedDomainForTask("")
+  }
+
+  const handleRemoveTask = (domainId: string, taskId: string) => {
+    if (!certification) return
+
+    const updatedDomains = certification.domains.map((domain) => {
+      if (domain.id === domainId) {
+        return {
+          ...domain,
+          tasks: domain.tasks.filter((task) => task.id !== taskId),
+        }
+      }
+      return domain
+    })
+
+    setCertification({ ...certification, domains: updatedDomains })
   }
 
   const handleAddTestType = () => {
@@ -735,22 +839,69 @@ export default function EditCertificationPage({ params }: { params: { id: string
 
                   <div className="rounded-md border">
                     <div className="p-4">
-                      <h3 className="font-medium">Domains</h3>
+                      <h3 className="font-medium">Domains & Tasks</h3>
                       {certification.domains.length === 0 ? (
                         <p className="text-sm text-muted-foreground mt-2">No domains added yet.</p>
                       ) : (
-                        <div className="mt-2 space-y-2">
+                        <div className="mt-2 space-y-4">
                           {certification.domains.map((domain) => (
-                            <div key={domain.id} className="flex items-center justify-between rounded-md border p-2">
-                              <p className="font-medium">{domain.name}</p>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleRemoveDomain(domain.id)}
-                                className="h-8 w-8 text-destructive"
-                              >
-                                <Minus className="h-4 w-4" />
-                              </Button>
+                            <div key={domain.id} className="border rounded-md p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="font-medium">{domain.name}</p>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleRemoveDomain(domain.id)}
+                                  className="h-8 w-8 text-destructive"
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </Button>
+                              </div>
+
+                              {/* Tasks for this domain */}
+                              <div className="ml-4 space-y-2">
+                                <div className="flex gap-2">
+                                  <Input
+                                    placeholder="Task name"
+                                    value={selectedDomainForTask === domain.id ? newTask : ""}
+                                    onChange={(e) => {
+                                      setNewTask(e.target.value)
+                                      setSelectedDomainForTask(domain.id)
+                                    }}
+                                    className="text-sm"
+                                  />
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    onClick={() => handleAddTask(domain.id)}
+                                    disabled={!newTask || selectedDomainForTask !== domain.id}
+                                  >
+                                    <Plus className="h-3 w-3 mr-1" />
+                                    Add Task
+                                  </Button>
+                                </div>
+
+                                {domain.tasks.length > 0 && (
+                                  <div className="space-y-1">
+                                    {domain.tasks.map((task) => (
+                                      <div
+                                        key={task.id}
+                                        className="flex items-center justify-between bg-muted/30 rounded p-2"
+                                      >
+                                        <span className="text-sm">{task.name}</span>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => handleRemoveTask(domain.id, task.id)}
+                                          className="h-6 w-6 text-destructive"
+                                        >
+                                          <Minus className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -924,15 +1075,24 @@ export default function EditCertificationPage({ params }: { params: { id: string
               </div>
 
               <div>
-                <h3 className="text-sm font-medium">Domains</h3>
+                <h3 className="text-sm font-medium">Domains & Tasks</h3>
                 {certification.domains.length === 0 ? (
                   <p className="text-sm text-muted-foreground mt-1">No domains added</p>
                 ) : (
-                  <ul className="text-sm text-muted-foreground mt-1 list-disc list-inside">
+                  <div className="text-sm text-muted-foreground mt-1 space-y-2">
                     {certification.domains.map((domain) => (
-                      <li key={domain.id}>{domain.name}</li>
+                      <div key={domain.id}>
+                        <p className="font-medium">{domain.name}</p>
+                        {domain.tasks.length > 0 && (
+                          <ul className="ml-4 list-disc list-inside text-xs">
+                            {domain.tasks.map((task) => (
+                              <li key={task.id}>{task.name}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </div>
 

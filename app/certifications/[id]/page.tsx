@@ -42,9 +42,30 @@ const certificationData = {
     image: "/placeholder.svg?height=225&width=400&text=PSM",
     questionCount: 120,
     domains: [
-      { id: "role", name: "Roles" },
-      { id: "artifact", name: "Artifacts" },
-      { id: "event", name: "Events" },
+      {
+        id: "role",
+        name: "Roles",
+        tasks: [
+          { id: "t1", name: "Scrum Master Responsibilities", domainId: "role" },
+          { id: "t2", name: "Product Owner Duties", domainId: "role" },
+        ],
+      },
+      {
+        id: "artifact",
+        name: "Artifacts",
+        tasks: [
+          { id: "t3", name: "Product Backlog Management", domainId: "artifact" },
+          { id: "t4", name: "Sprint Backlog Creation", domainId: "artifact" },
+        ],
+      },
+      {
+        id: "event",
+        name: "Events",
+        tasks: [
+          { id: "t5", name: "Sprint Planning", domainId: "event" },
+          { id: "t6", name: "Daily Scrum", domainId: "event" },
+        ],
+      },
     ],
     testTypes: [
       { id: "short", name: "Short Test", questions: 10, time: 15, isPremium: false },
@@ -142,6 +163,7 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
   const { hasAccess } = useSubscription()
   const { toast } = useToast()
   const router = useRouter()
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([])
 
   // Get certification data based on ID
   const certification = certificationData[params.id as keyof typeof certificationData]
@@ -166,6 +188,14 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
       setSelectedDomains([...selectedDomains, domain])
     } else {
       setSelectedDomains(selectedDomains.filter((d) => d !== domain))
+    }
+  }
+
+  const handleTaskChange = (taskId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedTasks([...selectedTasks, taskId])
+    } else {
+      setSelectedTasks(selectedTasks.filter((t) => t !== taskId))
     }
   }
 
@@ -202,6 +232,20 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
       return
     }
 
+    // Check if any selected domain has tasks and if tasks are selected
+    const selectedDomainsWithTasks = certification.domains.filter(
+      (domain) => selectedDomains.includes(domain.id) && domain.tasks && domain.tasks.length > 0,
+    )
+
+    if (selectedDomainsWithTasks.length > 0 && selectedTasks.length === 0) {
+      toast({
+        title: "Task selection required",
+        description: "Please select at least one task from the selected domains.",
+        variant: "destructive",
+      })
+      return
+    }
+
     const isPremiumTest = certification.testTypes.find((type) => type.id === selectedTestType)?.isPremium
 
     if (isPremiumTest && !hasAccess) {
@@ -209,8 +253,11 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
       return
     }
 
-    // Navigate to the test page
-    router.push(`/take-test?certification=${params.id}&type=${selectedTestType}&domains=${selectedDomains.join(",")}`)
+    // Navigate to the test page with tasks
+    const tasksParam = selectedTasks.length > 0 ? `&tasks=${selectedTasks.join(",")}` : ""
+    router.push(
+      `/take-test?certification=${params.id}&type=${selectedTestType}&domains=${selectedDomains.join(",")}${tasksParam}`,
+    )
   }
 
   const handleSubscribe = () => {
@@ -306,25 +353,64 @@ export default function CertificationDetailPage({ params }: { params: { id: stri
                 <h3 className="font-medium">Select Domain Focus</h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   {certification.domains.map((domain) => (
-                    <div key={domain.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`domain-${domain.id}`}
-                        checked={selectedDomains.includes(domain.id)}
-                        onCheckedChange={(checked) => handleDomainChange(domain.id, checked === true)}
-                      />
-                      <Label htmlFor={`domain-${domain.id}`} className="font-medium">
-                        {domain.name}
-                      </Label>
+                    <div key={domain.id} className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`domain-${domain.id}`}
+                          checked={selectedDomains.includes(domain.id)}
+                          onCheckedChange={(checked) => handleDomainChange(domain.id, checked === true)}
+                        />
+                        <Label htmlFor={`domain-${domain.id}`} className="font-medium">
+                          {domain.name}
+                        </Label>
+                      </div>
+
+                      {/* Tasks for this domain */}
+                      {selectedDomains.includes(domain.id) && domain.tasks && domain.tasks.length > 0 && (
+                        <div className="ml-6 space-y-1">
+                          {domain.tasks.map((task) => (
+                            <div key={task.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`task-${task.id}`}
+                                checked={selectedTasks.includes(task.id)}
+                                onCheckedChange={(checked) => handleTaskChange(task.id, checked === true)}
+                              />
+                              <Label htmlFor={`task-${task.id}`} className="text-sm text-muted-foreground">
+                                {task.name}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
                 {selectedDomains.length === 0 && (
                   <p className="text-sm text-muted-foreground">Please select at least one domain</p>
                 )}
+                {selectedDomains.length > 0 &&
+                  certification.domains.some(
+                    (domain) => selectedDomains.includes(domain.id) && domain.tasks && domain.tasks.length > 0,
+                  ) &&
+                  selectedTasks.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-amber-600">
+                      Please select at least one task from the selected domains
+                    </p>
+                  )}
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleStartTest} className="w-full" disabled={selectedDomains.length === 0}>
+              <Button
+                onClick={handleStartTest}
+                className="w-full"
+                disabled={
+                  selectedDomains.length === 0 ||
+                  (certification.domains.some(
+                    (domain) => selectedDomains.includes(domain.id) && domain.tasks && domain.tasks.length > 0,
+                  ) &&
+                    selectedTasks.length === 0)
+                }
+              >
                 Start Practice Test
               </Button>
             </CardFooter>

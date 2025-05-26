@@ -34,6 +34,7 @@ const mockQuestions: Question[] = [
     explanation:
       "The Scrum Master is responsible for facilitating Scrum events, removing impediments, and ensuring the team follows Scrum practices.",
     domain: "role",
+    taskId: "t1",
     difficulty: "medium",
     source: "Scrum Guide 2020",
   },
@@ -50,6 +51,7 @@ const mockQuestions: Question[] = [
     explanation:
       "The Burndown Chart is a tool used in Scrum, but it is not one of the three official Scrum artifacts (Product Backlog, Sprint Backlog, and Increment).",
     domain: "artifact",
+    taskId: "t3",
     difficulty: "easy",
     source: "Scrum Guide 2020",
   },
@@ -66,6 +68,7 @@ const mockQuestions: Question[] = [
     explanation:
       "For a one-month Sprint, Sprint Planning is time-boxed to a maximum of eight hours. For shorter Sprints, the event is proportionally shorter.",
     domain: "event",
+    taskId: "t5",
     difficulty: "medium",
     source: "Scrum Guide 2020",
   },
@@ -81,6 +84,7 @@ const mockQuestions: Question[] = [
     ],
     explanation: "The Product Owner is responsible for ordering the items in the Product Backlog to maximize value.",
     domain: "role",
+    taskId: "t2",
     difficulty: "easy",
     source: "Scrum Guide 2020",
   },
@@ -97,6 +101,7 @@ const mockQuestions: Question[] = [
     explanation:
       "During the Daily Scrum, the Development Team plans work for the next 24 hours, inspecting progress toward the Sprint Goal.",
     domain: "event",
+    taskId: "t6",
     difficulty: "medium",
     source: "Scrum Guide 2020",
   },
@@ -113,6 +118,7 @@ const mockQuestions: Question[] = [
     explanation:
       "The Scrum Guide recommends that Scrum Teams be small enough to remain nimble and large enough to complete significant work. Typically, 10 or fewer people works best.",
     domain: "role",
+    taskId: "t1",
     difficulty: "easy",
     source: "Scrum Guide 2020",
   },
@@ -129,6 +135,7 @@ const mockQuestions: Question[] = [
     explanation:
       "The Sprint Review is a meeting held at the end of the Sprint to inspect the increment and adapt the Product Backlog if needed.",
     domain: "event",
+    taskId: "t5",
     difficulty: "medium",
     source: "Scrum Guide 2020",
   },
@@ -145,6 +152,7 @@ const mockQuestions: Question[] = [
     explanation:
       "The Sprint Retrospective is an opportunity for the Scrum Team to inspect itself and create a plan for improvements to be enacted during the next Sprint.",
     domain: "event",
+    taskId: "t6",
     difficulty: "medium",
     source: "Scrum Guide 2020",
   },
@@ -160,6 +168,7 @@ const mockQuestions: Question[] = [
     ],
     explanation: "The Daily Scrum is time-boxed to 15 minutes, regardless of team size.",
     domain: "event",
+    taskId: "t6",
     difficulty: "easy",
     source: "Scrum Guide 2020",
   },
@@ -176,6 +185,7 @@ const mockQuestions: Question[] = [
     explanation:
       "The five values of Scrum are Commitment, Focus, Openness, Respect, and Courage. Efficiency is not one of the Scrum values.",
     domain: "artifact",
+    taskId: "t4",
     difficulty: "hard",
     source: "Scrum Guide 2020",
   },
@@ -253,6 +263,33 @@ const testTypes = {
   medium: "Medium Test (30 questions)",
   full: "Full Test (80 questions)",
 }
+
+const mockDomains = [
+  {
+    id: "role",
+    name: "Roles",
+    tasks: [
+      { id: "t1", name: "Scrum Master Responsibilities", domainId: "role" },
+      { id: "t2", name: "Product Owner Duties", domainId: "role" },
+    ],
+  },
+  {
+    id: "artifact",
+    name: "Artifacts",
+    tasks: [
+      { id: "t3", name: "Product Backlog Management", domainId: "artifact" },
+      { id: "t4", name: "Sprint Backlog Creation", domainId: "artifact" },
+    ],
+  },
+  {
+    id: "event",
+    name: "Events",
+    tasks: [
+      { id: "t5", name: "Sprint Planning", domainId: "event" },
+      { id: "t6", name: "Daily Scrum", domainId: "event" },
+    ],
+  },
+]
 
 export default function TestResultsPage() {
   const router = useRouter()
@@ -411,7 +448,6 @@ export default function TestResultsPage() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold">Test Results</h1>
       </div>
 
       <div className="w-full">
@@ -622,15 +658,26 @@ export default function TestResultsPage() {
                 <p className="text-sm">{selectedQuestionForExplanation.explanation}</p>
               </div>
 
-              <div className="pt-2 flex items-center gap-2">
+              {selectedQuestionForExplanation.source && (
+                <div>
+                  <h3 className="text-base font-medium mb-1">Source:</h3>
+                  <p className="text-sm">{selectedQuestionForExplanation.source}</p>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center gap-2 flex-wrap">
                 <Badge variant="outline" className="capitalize text-xs">
                   Domain: {selectedQuestionForExplanation.domain}
                 </Badge>
-                {selectedQuestionForExplanation.source && (
-                  <Badge variant="outline" className="text-xs">
-                    Source: {selectedQuestionForExplanation.source}
-                  </Badge>
-                )}
+                {(() => {
+                  const domain = mockDomains.find((d) => d.id === selectedQuestionForExplanation.domain)
+                  const task = domain?.tasks.find((t) => t.id === selectedQuestionForExplanation.taskId)
+                  return task ? (
+                    <Badge variant="outline" className="text-xs">
+                      Task: {task.name}
+                    </Badge>
+                  ) : null
+                })()}
               </div>
             </div>
           )}
